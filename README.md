@@ -18,3 +18,10 @@ This includes endpoints exposed for specific purposes, and guidelines for fronte
 
 This file will be updated as required during the course of development.
 
+## Collaboration rules and Version Control
+
+Sequel to the above, both the backend and AI developer should create branches, separate from the master branch, to add new features.
+These features may then be merged with the main branch after some sort of integration testing.
+
+This is to ensure that the main line of production is not riddled with error-filled code and also to make sure that damage control is in place in case of any unfortunate bugs or failed integrations.
+

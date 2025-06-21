@@ -16,7 +16,10 @@ The 'ai' folder is for the ai model and everything concerning LLMs and such.
 The 'shared-docs' folder is there to house the postman collections and all other forms of documentation that defines how interaction within this whole project should go.
 This includes endpoints exposed for specific purposes, and guidelines for frontend integration.
 
-This file will be updated as required during the course of development.
+I have taken the liberty of adding some stock files in the directories. This is mainly to facilitate the pushing of the directories to this remote URL, as git does not push empty directories.
+These files may be removed at the whim of the developer.
+
+This README file will be updated as required during the course of development.
 
 ## Collaboration rules and Version Control
 

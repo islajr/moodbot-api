@@ -60,6 +60,22 @@ public class JwtService {
 
     }
 
+    public String generateRefreshToken(String email) {
+        Map<String, Object> claims = new HashMap<>();
+
+        try {
+            return Jwts.builder()
+                    .subject(email)
+                    .claims(claims)
+                    .issuedAt(new Date(System.currentTimeMillis()))
+                    .expiration(new Date(System.currentTimeMillis() + refreshExpiration))
+                    .signWith(generateKey())
+                    .compact();
+        } catch (JwtException e) {
+            throw new RuntimeException("failed to generate refresh token");
+        }
+    }
+
     private Claims extractClaims(String token) {
         try {
 

@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,8 @@ public class UserService {
         return ResponseEntity.ok("""
                 access token: %s
                 
-                """.formatted(jwtService.generateToken(user.getEmail())));
+                refresh token: %s
+                """.formatted(jwtService.generateToken(user.getEmail()), jwtService.generateRefreshToken(user.getEmail())));
     }
 
     public ResponseEntity<String> loginUser(UserLoginDTO userLoginDTO) {
@@ -43,12 +45,24 @@ public class UserService {
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.identifier(), userLoginDTO.password()));
 
         if (authentication.isAuthenticated()) {
-            UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(userLoginDTO.identifier());
+            String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(userLoginDTO.identifier())).getEmail();
             return ResponseEntity.ok("""
                     access token: %s
                     
-                    """.formatted(jwtService.generateToken(userPrincipal.getEmail())));
+                    refresh token: %s
+                    """.formatted(jwtService.generateToken(email), jwtService.generateRefreshToken(email)));
         }
         throw new BadCredentialsException("incorrect details");
+    }
+
+    public ResponseEntity<String> refreshToken() {
+        String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
+
+        return ResponseEntity.ok("""
+                access token: %s
+                
+                refresh token: %s
+                """.formatted(jwtService.generateToken(email), jwtService.generateRefreshToken(email)));
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @AllArgsConstructor
 @Component
@@ -24,6 +25,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final MyUserDetailsService myUserDetailsService;
     private final JwtService jwtService;
+    private final List<String> PUBLIC_URLS = List.of(
+            "/api/v1/moodbot/auth/register",
+            "/api/v1/moodbot/auth/login"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,6 +36,13 @@ public class JwtFilter extends OncePerRequestFilter {
         final String AUTH_PREFIX = "Bearer ";
         String token = null;
         String email = null;
+        String url = request.getRequestURI();
+
+        if (PUBLIC_URLS.contains(url)){
+            System.out.println("skipping jwt filter for path: " + url);
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (authHeader != null && authHeader.startsWith(AUTH_PREFIX)) {
             token = authHeader.substring(AUTH_PREFIX.length());

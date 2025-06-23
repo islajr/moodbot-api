@@ -19,6 +19,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegisterDTO userRegisterDTO) {
+        System.out.println("controller hit!");
         return userService.registerUser(userRegisterDTO);
     }
 

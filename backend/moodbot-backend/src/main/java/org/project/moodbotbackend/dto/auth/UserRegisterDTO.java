@@ -23,7 +23,7 @@ public record UserRegisterDTO(
 
     public static User toUser(UserRegisterDTO userRegisterDTO) {
         User user = new User();
-        user.setEmail(userRegisterDTO.email);
+        user.setUsername(userRegisterDTO.username);
         user.setEmail(userRegisterDTO.email);
         user.setPassword(userRegisterDTO.password);
         return user;

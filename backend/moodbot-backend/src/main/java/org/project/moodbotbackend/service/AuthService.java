@@ -5,7 +5,7 @@ import org.project.moodbotbackend.dto.auth.UserLoginDTO;
 import org.project.moodbotbackend.dto.auth.UserRegisterDTO;
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
-import org.project.moodbotbackend.repository.UserRepository;
+import org.project.moodbotbackend.repository.AuthRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -33,7 +33,7 @@ public class AuthService {
         user.setCreatedAt(LocalDateTime.now());
 
 
-        userRepository.save(user);
+        authRepository.save(user);
         return ResponseEntity.ok("""
                 access token: %s
                 

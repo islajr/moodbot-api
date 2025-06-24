@@ -3,7 +3,7 @@ package org.project.moodbotbackend.controller;
 import lombok.AllArgsConstructor;
 import org.project.moodbotbackend.dto.auth.UserLoginDTO;
 import org.project.moodbotbackend.dto.auth.UserRegisterDTO;
-import org.project.moodbotbackend.service.UserService;
+import org.project.moodbotbackend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,22 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/moodbot/auth")
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegisterDTO userRegisterDTO) {
-        System.out.println("controller hit!");
-        return userService.registerUser(userRegisterDTO);
+        return authService.registerUser(userRegisterDTO);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
-        return userService.loginUser(userLoginDTO);
+        return authService.loginUser(userLoginDTO);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshToken() {
-        return userService.refreshToken();
+        return authService.refreshToken();
     }
 
 }

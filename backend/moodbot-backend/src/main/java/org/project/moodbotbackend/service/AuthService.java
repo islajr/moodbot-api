@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -31,6 +31,7 @@ public class UserService {
         User user = UserRegisterDTO.toUser(userRegisterDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
+
 
         userRepository.save(user);
         return ResponseEntity.ok("""

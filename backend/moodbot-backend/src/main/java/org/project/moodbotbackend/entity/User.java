@@ -24,12 +24,12 @@ public class User {
 
     @NotNull
     @Column(name = "username")
-    @Size(max = 20)
+    @Size(min = 1, max = 20)
     String username;
 
     @NotNull
     @Column(name = "email")
-    @Size(min = 1, max = 50)
+    @Size(min = 5, max = 50)
     String email;
 
     @NotNull

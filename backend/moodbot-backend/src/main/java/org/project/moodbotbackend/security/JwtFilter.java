@@ -28,7 +28,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final List<String> PUBLIC_URLS = List.of(
             "/api/v1/moodbot/auth/register",
-            "/api/v1/moodbot/auth/login"
+            "/api/v1/moodbot/auth/login",
+            "/api/v1/moodbot/auth/verify"
     );
     private final TokenService tokenService;
 

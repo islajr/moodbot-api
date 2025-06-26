@@ -3,12 +3,10 @@ package org.project.moodbotbackend.controller;
 import lombok.AllArgsConstructor;
 import org.project.moodbotbackend.dto.auth.UserLoginDTO;
 import org.project.moodbotbackend.dto.auth.UserRegisterDTO;
+import org.project.moodbotbackend.dto.auth.VerificationDTO;
 import org.project.moodbotbackend.service.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
@@ -30,6 +28,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshToken() {
         return authService.refreshToken();
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<String> verifyAction(@RequestParam String action, @RequestBody VerificationDTO verificationDTO) {
+        return authService.verify(action, verificationDTO.email(), verificationDTO.code());
     }
 
 }

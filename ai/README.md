@@ -1,5 +1,5 @@
 
-# MoodBot Backend – AI Mental Health Support Chatbot (FastAPI + OpenAI)
+# MoodBot Backend – AI Mental Health Support Chatbot
 
 This is the backend service for MoodBot, a mental health chatbot powered by OpenAI. It handles real-time messaging, emotion detection, calming techniques, and daily mood tracking.
 

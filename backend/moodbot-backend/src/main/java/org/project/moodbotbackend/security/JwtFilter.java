@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.project.moodbotbackend.util.TokenService;
 import org.project.moodbotbackend.entity.UserPrincipal;
 import org.project.moodbotbackend.service.JwtService;
 import org.project.moodbotbackend.service.MyUserDetailsService;
@@ -29,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/moodbot/auth/register",
             "/api/v1/moodbot/auth/login"
     );
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,6 +49,12 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith(AUTH_PREFIX)) {
             token = authHeader.substring(AUTH_PREFIX.length());
             email = jwtService.extractEmail(token);
+        }
+
+        // check if token has been disallowed
+        if (!tokenService.isTokenAllowed(token)) {
+            System.out.println("blacklisting token!");
+            throw new BadCredentialsException("expired or disallowed token!");  // handle this better later on.
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {

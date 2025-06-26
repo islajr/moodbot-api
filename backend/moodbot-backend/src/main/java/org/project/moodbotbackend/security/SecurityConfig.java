@@ -24,18 +24,25 @@ public class SecurityConfig {
 
     private final MyUserDetailsService myUserDetailsService;
     private final JwtFilter jwtFilter;
+    private final CustomLogoutHandler customLogoutHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers(
-                        "/api/v1/moodbot/auth/**"
-                ).permitAll().anyRequest().authenticated())
+                        "/api/v1/moodbot/auth/register",
+                        "/api/v1/moodbot/auth/login"
+                ).permitAll()
+                        .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(Customizer.withDefaults())
+                .logout(logout -> logout
+                        .logoutUrl("/api/v1/moodbot/auth/logout")
+                        .addLogoutHandler(customLogoutHandler)
+                        .logoutSuccessHandler(customLogoutSuccessHandler))
                 .build();
     }
 

@@ -31,8 +31,8 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<String> verifyAction(@RequestParam String action, @RequestBody VerificationDTO verificationDTO) {
-        return authService.verify(action, verificationDTO.email(), verificationDTO.code());
+    public ResponseEntity<String> verifyAction(@RequestBody VerificationDTO verificationDTO) {
+        return authService.verify(verificationDTO.email(), verificationDTO.code());
     }
 
 }

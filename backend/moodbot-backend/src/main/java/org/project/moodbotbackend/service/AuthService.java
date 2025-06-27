@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Random;
 
 import static org.project.moodbotbackend.util.EmailUtil.generateBody;
+import static org.project.moodbotbackend.util.EmailUtil.generateOTP;
 
 @Service
 @AllArgsConstructor
@@ -65,7 +65,7 @@ public class AuthService {
         // add to temp cache
         tempCache.put(user.getEmail(), verificationCode);
 
-        return ResponseEntity.ok("""
+        return ResponseEntity.status(HttpStatus.CREATED).body("""
                 registration successful!
                 confirmation e-mail has been sent to %s
                 """.formatted(user.getEmail()));
@@ -100,7 +100,7 @@ public class AuthService {
         return generateToken(email);
     }
 
-    public ResponseEntity<String> verify(String action, String email, int code) {
+    public ResponseEntity<String> verify(String email, int code) {
         // scan cache for username;
         Integer verificationCode = tempCache.getIfPresent(email);
 
@@ -113,22 +113,10 @@ public class AuthService {
         }
 
         // tempCache.invalidate(email);
-
-        switch(action) {
-            case "register" -> {
-                User user = authRepository.findUserByEmail(email);
-                user.setEmailVerified(true);
-                authRepository.save(user);
-                return generateToken(email);    // generate JWT
-            }
-
-            case "reset" -> {
-                return ResponseEntity.ok("update successful");
-            }
-            default -> {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("no such action.");
-            }
-        }
+        User user = authRepository.findUserByEmail(email);
+        user.setEmailVerified(true);
+        authRepository.save(user);
+        return generateToken(email);    // generate JWT
     }
 
     private ResponseEntity<String> generateToken(String email) {
@@ -137,10 +125,5 @@ public class AuthService {
                 
                 refresh token: %s
                 """.formatted(jwtService.generateToken(email), jwtService.generateRefreshToken(email)));
-    }
-
-    private Integer generateOTP() {
-        Random random = new Random();
-        return (int) (random.nextFloat(6) * 1000000);
     }
 }

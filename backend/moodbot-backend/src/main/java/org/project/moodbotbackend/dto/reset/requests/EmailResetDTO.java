@@ -1,4 +1,4 @@
-package org.project.moodbotbackend.dto.reset;
+package org.project.moodbotbackend.dto.reset.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

@@ -1,9 +1,9 @@
 package org.project.moodbotbackend.controller;
 
 import lombok.AllArgsConstructor;
-import org.project.moodbotbackend.dto.auth.UserLoginDTO;
-import org.project.moodbotbackend.dto.auth.UserRegisterDTO;
-import org.project.moodbotbackend.dto.auth.VerificationDTO;
+import org.project.moodbotbackend.dto.auth.requests.UserLoginDTO;
+import org.project.moodbotbackend.dto.auth.requests.UserRegisterDTO;
+import org.project.moodbotbackend.dto.auth.requests.VerificationDTO;
 import org.project.moodbotbackend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

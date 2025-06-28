@@ -1,4 +1,4 @@
-package org.project.moodbotbackend.dto.reset;
+package org.project.moodbotbackend.dto.reset.requests;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

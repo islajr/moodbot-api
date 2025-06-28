@@ -1,10 +1,10 @@
 package org.project.moodbotbackend.controller;
 
 import lombok.AllArgsConstructor;
-import org.project.moodbotbackend.dto.reset.EmailResetDTO;
-import org.project.moodbotbackend.dto.reset.PasswordResetDTO;
-import org.project.moodbotbackend.dto.reset.ResetDTO;
-import org.project.moodbotbackend.dto.reset.UsernameResetDTO;
+import org.project.moodbotbackend.dto.reset.requests.EmailResetDTO;
+import org.project.moodbotbackend.dto.reset.requests.PasswordResetDTO;
+import org.project.moodbotbackend.dto.reset.requests.ResetDTO;
+import org.project.moodbotbackend.dto.reset.requests.UsernameResetDTO;
 import org.project.moodbotbackend.service.ResetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

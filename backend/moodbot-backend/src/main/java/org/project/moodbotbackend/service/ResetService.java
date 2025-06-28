@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Service
@@ -64,6 +65,7 @@ public class ResetService {
 
         if (user != null) {
             user.setUsername(usernameResetDTO.username());
+            user.setUpdatedAt(LocalDateTime.now());
             authRepository.save(user);
 
             return ResponseEntity.ok("successfully updated username");
@@ -92,22 +94,22 @@ public class ResetService {
 
         if (action.equals("password")) {
             String newPassword = passwordCache.getIfPresent(email);
+            passwordCache.invalidate(email);    // remove from cache
             Integer otp = otpCache.getIfPresent(email);
+            otpCache.invalidate(email); // remove from cache
             if (otp != null) {
                 if (otp != code) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect code.");
                 }
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("please try again");
-            }
-
-            if (newPassword != null) {
-                User user = authRepository.findUserByEmail(email);
-                if (user != null) {
+                if (newPassword != null) {
+                    User user = authRepository.findUserByEmail(email);
                     user.setPassword(passwordEncoder.encode(newPassword));
+                    user.setCreatedAt(LocalDateTime.now());
+                    authRepository.save(user);
+                    return ResponseEntity.status(HttpStatus.OK).body("password successfully updated!");
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("please try again");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("expired code. please try again");
             }
 
         } else if (action.equals("email")) {
@@ -118,19 +120,20 @@ public class ResetService {
                 if (otp != code) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect code.");
                 }
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("please try again");
-            }
-
-            if (newEmail != null) {
-                User user = authRepository.findUserByEmail(email);
-                if (user != null) {
-                    user.setEmail(newEmail);
-                    user.setEmailVerified(true);
+                if (newEmail != null) {
+                    User user = authRepository.findUserByEmail(email);
+                    if (user != null) {
+                        user.setEmail(newEmail);
+                        user.setEmailVerified(true);
+                        user.setUpdatedAt(LocalDateTime.now());
+                        authRepository.save(user);
+                        return ResponseEntity.ok("e-mail successfully updated!");
+                    }
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("please try again");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("expired code. please try again");
             }
+
 
 
         } else {

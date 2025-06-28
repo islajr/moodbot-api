@@ -77,8 +77,10 @@ public class AuthService {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.identifier(), userLoginDTO.password()));
             String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(userLoginDTO.identifier())).getEmail();
+            String username = myUserDetailsService.loadUserByUsername(userLoginDTO.identifier()).getUsername();
 
-            if (email != null) {
+
+        if (email != null) {
                 User user = authRepository.findUserByEmail(email);
 
                 if (user != null && user.isEmailVerified()) {
@@ -87,7 +89,26 @@ public class AuthService {
                     }
                     throw new BadCredentialsException("incorrect details");
                 }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("please verify your e-mail first.");
+
+                // prompt e-mail verification if un-verified
+                int verificationCode = generateOTP();    // generate code.
+                String body = generateBody(username, "register", verificationCode);
+
+                EmailDetails emailDetails = new EmailDetails(
+                        email,
+                        body,
+                        "Account Creation Confirmation"
+                );
+                emailService.sendMail(emailDetails);
+
+                // add to temp cache
+                tempCache.put(email, verificationCode);
+                return ResponseEntity.status(HttpStatus.CREATED).body("""
+                    please confirm your e-mail before you proceed!
+                    confirmation e-mail has been sent to %s.
+                    """.formatted(email)
+                );
+
             } return ResponseEntity.status(HttpStatus.NOT_FOUND).body("no such user.");
 
 

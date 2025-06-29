@@ -3,6 +3,7 @@ package org.project.moodbotbackend.service;
 import lombok.AllArgsConstructor;
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
+import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.project.moodbotbackend.repository.AuthRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +41,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         // finally
         if (user == null) {
-            throw new BadCredentialsException("no such user!");
+            throw new AuthException(404, "no such user!");
         }
 
         return new UserPrincipal(user);

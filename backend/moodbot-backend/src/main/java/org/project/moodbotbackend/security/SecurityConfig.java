@@ -34,7 +34,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers(
                         "/api/v1/moodbot/auth/register",
                         "/api/v1/moodbot/auth/login",
-                        "/api/v1/moodbot/auth/verify"
+                        "/api/v1/moodbot/auth/verify",
+                        "/api/v1/moodbot/auth/confirm"
                 ).permitAll()
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.project.moodbotbackend.util.TokenService;
 import org.project.moodbotbackend.entity.UserPrincipal;
 import org.project.moodbotbackend.service.JwtService;
@@ -29,7 +30,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final List<String> PUBLIC_URLS = List.of(
             "/api/v1/moodbot/auth/register",
             "/api/v1/moodbot/auth/login",
-            "/api/v1/moodbot/auth/verify"
+            "/api/v1/moodbot/auth/verify",
+            "/api/v1/moodbot/auth/confirm"
     );
     private final TokenService tokenService;
 
@@ -55,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // check if token has been disallowed
         if (!tokenService.isTokenAllowed(token)) {
             System.out.println("blacklisting token!");
-            throw new BadCredentialsException("expired or disallowed token!");  // handle this better later on.
+            throw new AuthException(401, "expired or disallowed token!");
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -69,9 +71,9 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } else {
             if (token != null)
-                throw new BadCredentialsException("invalid token!");    // change to JwtException or custom later.
+                throw new AuthException(401, "invalid token!");    // change to JwtException or custom later.
             else
-                throw new BadRequestException("problematic request!");    // problem with the request
+                throw new AuthException(500, "problematic request!");    // problem with the request
         }
 
         filterChain.doFilter(request, response);

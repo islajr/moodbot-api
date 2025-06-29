@@ -28,6 +28,7 @@ public class SecurityConfig {
     private final CustomLogoutHandler customLogoutHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final AuthenticationEntryPoint authEntryPoint;
+    private final CustomCorsConfiguration customCorsConfiguration;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,6 +41,7 @@ public class SecurityConfig {
                         "/api/v1/moodbot/auth/confirm"
                 ).permitAll()
                         .anyRequest().authenticated())
+                .cors(c -> c.configurationSource(customCorsConfiguration))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

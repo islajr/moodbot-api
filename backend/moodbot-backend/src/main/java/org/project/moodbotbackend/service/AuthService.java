@@ -5,9 +5,12 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.AllArgsConstructor;
 import org.project.moodbotbackend.dto.auth.requests.UserLoginDTO;
 import org.project.moodbotbackend.dto.auth.requests.UserRegisterDTO;
+import org.project.moodbotbackend.dto.auth.responses.EmailConfirmResponseDTO;
+import org.project.moodbotbackend.dto.auth.responses.TokenResponseDTO;
 import org.project.moodbotbackend.entity.EmailDetails;
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
+import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.project.moodbotbackend.repository.AuthRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +44,13 @@ public class AuthService {
             .maximumSize(1000)
             .build();
 
-    public ResponseEntity<String> registerUser(UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<EmailConfirmResponseDTO> registerUser(UserRegisterDTO userRegisterDTO) {
         User user = UserRegisterDTO.toUser(userRegisterDTO);
         if (authRepository.existsByUsername(user.getUsername()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("username is taken!");
+            throw new AuthException(409, "username is taken!");
         if (authRepository.existsByEmail(user.getEmail()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("e-mail is taken!");
+            throw new AuthException(409, "e-mail is taken!");
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
         user.setEmailVerified(false);
@@ -65,15 +69,10 @@ public class AuthService {
         // add to temp cache
         tempCache.put(user.getEmail(), verificationCode);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("""
-                registration successful!
-                confirmation e-mail has been sent to %s
-                """.formatted(user.getEmail()));
-
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EmailConfirmResponseDTO("registration successful", user.getEmail()));
     }
 
-    public ResponseEntity<String> loginUser(UserLoginDTO userLoginDTO) {
+    public ResponseEntity<TokenResponseDTO> loginUser(UserLoginDTO userLoginDTO) {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.identifier(), userLoginDTO.password()));
             String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(userLoginDTO.identifier())).getEmail();
@@ -87,50 +86,31 @@ public class AuthService {
                     if (authentication.isAuthenticated()) {
                         return generateToken(email);
                     }
-                    throw new BadCredentialsException("incorrect details");
+                    throw new AuthException(400, "incorrect details");
                 }
 
-                // prompt e-mail verification if un-verified
-                int verificationCode = generateOTP();    // generate code.
-                String body = generateBody(username, "register", verificationCode);
-
-                EmailDetails emailDetails = new EmailDetails(
-                        email,
-                        body,
-                        "Account Creation Confirmation"
-                );
-                emailService.sendMail(emailDetails);
-
-                // add to temp cache
-                tempCache.put(email, verificationCode);
-                return ResponseEntity.status(HttpStatus.CREATED).body("""
-                    please confirm your e-mail before you proceed!
-                    confirmation e-mail has been sent to %s.
-                    """.formatted(email)
-                );
-
-            } return ResponseEntity.status(HttpStatus.NOT_FOUND).body("no such user.");
+        } throw new AuthException(404, "no such user.");
 
 
     }
 
-    public ResponseEntity<String> refreshToken() {
+    public ResponseEntity<TokenResponseDTO> refreshToken() {
         String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
         String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
 
         return generateToken(email);
     }
 
-    public ResponseEntity<String> verify(String email, int code) {
+    public ResponseEntity<TokenResponseDTO> confirm(String email, int code) {
         // scan cache for username;
         Integer verificationCode = tempCache.getIfPresent(email);
 
         if (verificationCode != null) {
             if (verificationCode != code) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect code.");
+                throw new AuthException(400, "incorrect code.");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("please try again");
+            throw new AuthException(400, "please try again");
         }
 
         // tempCache.invalidate(email);
@@ -140,11 +120,32 @@ public class AuthService {
         return generateToken(email);    // generate JWT
     }
 
-    private ResponseEntity<String> generateToken(String email) {
-        return ResponseEntity.ok("""
-                access token: %s
-                
-                refresh token: %s
-                """.formatted(jwtService.generateToken(email), jwtService.generateRefreshToken(email)));
+    public ResponseEntity<EmailConfirmResponseDTO> verify(String email) {
+
+        tempCache.invalidate(email);
+        String username = myUserDetailsService.loadUserByUsername(email).getUsername();
+
+        int verificationCode = generateOTP();    // generate code.
+        String body = generateBody(username, "register", verificationCode);
+
+        EmailDetails emailDetails = new EmailDetails(
+                email,
+                body,
+                "Account Creation Confirmation"
+        );
+        emailService.sendMail(emailDetails);
+
+        // add to temp cache
+        tempCache.put(email, verificationCode);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EmailConfirmResponseDTO(
+                "a verification e-mail has been re-sent to your e-mail", email
+        ));
+
+    }
+
+
+
+    private ResponseEntity<TokenResponseDTO> generateToken(String email) {
+        return ResponseEntity.ok(new TokenResponseDTO(jwtService.generateToken(email), jwtService.generateRefreshToken(email)));
     }
 }

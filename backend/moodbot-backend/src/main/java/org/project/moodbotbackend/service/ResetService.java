@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import org.project.moodbotbackend.dto.reset.requests.EmailResetDTO;
 import org.project.moodbotbackend.dto.reset.requests.PasswordResetDTO;
 import org.project.moodbotbackend.dto.reset.requests.UsernameResetDTO;
+import org.project.moodbotbackend.dto.reset.responses.ResetResponseDTO;
 import org.project.moodbotbackend.entity.EmailDetails;
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
+import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.project.moodbotbackend.repository.AuthRepository;
 import org.project.moodbotbackend.util.EmailUtil;
 import org.springframework.http.HttpStatus;
@@ -41,7 +43,7 @@ public class ResetService {
             .build();
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<String> passwordReset(PasswordResetDTO passwordResetDTO) {
+    public ResponseEntity<ResetResponseDTO> passwordReset(PasswordResetDTO passwordResetDTO) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userPrincipal.getEmail();
         User user = authRepository.findUserByEmail(email);
@@ -53,14 +55,14 @@ public class ResetService {
         otpCache.put(email, code);
         passwordCache.put(email, passwordResetDTO.password());
 
-        return ResponseEntity.ok("confirmation email sent. please check your mail");
+        return ResponseEntity.ok(new ResetResponseDTO("confirmation email sent. please check your mail"));
     }
 
-    public ResponseEntity<String> usernameReset(UsernameResetDTO usernameResetDTO) {
+    public ResponseEntity<ResetResponseDTO> usernameReset(UsernameResetDTO usernameResetDTO) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userPrincipal.getEmail();
         if (authRepository.existsByUsername(usernameResetDTO.username()))
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("username already exists.");
+            throw new AuthException(409, "username already exists.");
         User user = authRepository.findUserByEmail(email);
 
         if (user != null) {
@@ -68,11 +70,11 @@ public class ResetService {
             user.setUpdatedAt(LocalDateTime.now());
             authRepository.save(user);
 
-            return ResponseEntity.ok("successfully updated username");
-        } return ResponseEntity.status(HttpStatus.NOT_FOUND).body("unable to update username");
+            return ResponseEntity.ok(new ResetResponseDTO("successfully updated username"));
+        } return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResetResponseDTO("unable to update username"));
     }
 
-    public ResponseEntity<String> emailReset(EmailResetDTO emailResetDTO) {
+    public ResponseEntity<ResetResponseDTO> emailReset(EmailResetDTO emailResetDTO) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userPrincipal.getEmail();
         User user =authRepository.findUserByEmail(email);
@@ -84,10 +86,10 @@ public class ResetService {
         otpCache.put(email, code);
         emailCache.put(email, emailResetDTO.email());
 
-        return ResponseEntity.ok("confirmation email sent. please check your mail");
+        return ResponseEntity.ok(new ResetResponseDTO("confirmation email sent. please check your mail"));
     }
 
-    public ResponseEntity<String> verify(String action, int code) {
+    public ResponseEntity<ResetResponseDTO> verify(String action, int code) {
 
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = userPrincipal.getEmail();
@@ -99,17 +101,17 @@ public class ResetService {
             otpCache.invalidate(email); // remove from cache
             if (otp != null) {
                 if (otp != code) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect code.");
+                    throw new AuthException(400, "incorrect code");
                 }
                 if (newPassword != null) {
                     User user = authRepository.findUserByEmail(email);
                     user.setPassword(passwordEncoder.encode(newPassword));
                     user.setCreatedAt(LocalDateTime.now());
                     authRepository.save(user);
-                    return ResponseEntity.status(HttpStatus.OK).body("password successfully updated!");
+                    return ResponseEntity.status(HttpStatus.OK).body(new ResetResponseDTO("password successfully updated!"));
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("expired code. please try again");
+                throw new AuthException(401, "expired code. please try again");
             }
 
         } else if (action.equals("email")) {
@@ -118,7 +120,7 @@ public class ResetService {
 
             if (otp != null) {
                 if (otp != code) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect code.");
+                    throw new AuthException(400, "incorrect code.");
                 }
                 if (newEmail != null) {
                     User user = authRepository.findUserByEmail(email);
@@ -127,17 +129,17 @@ public class ResetService {
                         user.setEmailVerified(true);
                         user.setUpdatedAt(LocalDateTime.now());
                         authRepository.save(user);
-                        return ResponseEntity.ok("e-mail successfully updated!");
+                        return ResponseEntity.ok(new ResetResponseDTO("e-mail successfully updated!"));
                     }
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("expired code. please try again");
+                throw new AuthException(401, "expired code. please try again");
             }
 
 
 
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("unexpected action.");
+            throw new AuthException(500, "unexpected action.");
         }
 
         return null;

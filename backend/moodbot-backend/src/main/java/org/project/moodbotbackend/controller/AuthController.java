@@ -1,6 +1,7 @@
 package org.project.moodbotbackend.controller;
 
 import lombok.AllArgsConstructor;
+import org.project.moodbotbackend.dto.auth.requests.ConfirmationDTO;
 import org.project.moodbotbackend.dto.auth.requests.UserLoginDTO;
 import org.project.moodbotbackend.dto.auth.requests.UserRegisterDTO;
 import org.project.moodbotbackend.dto.auth.requests.VerificationDTO;
@@ -38,8 +39,8 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<EmailConfirmResponseDTO> verifyEmail(@RequestBody VerificationDTO verificationDTO) {
-        return authService.verify(verificationDTO.email());
+    public ResponseEntity<EmailConfirmResponseDTO> verifyEmail(@RequestBody ConfirmationDTO confirmationDTO) {
+        return authService.verify(confirmationDTO.email());
     }
 
 }

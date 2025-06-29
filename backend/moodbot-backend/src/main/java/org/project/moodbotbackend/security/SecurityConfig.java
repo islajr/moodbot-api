@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,18 +25,32 @@ public class SecurityConfig {
 
     private final MyUserDetailsService myUserDetailsService;
     private final JwtFilter jwtFilter;
+    private final CustomLogoutHandler customLogoutHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final AuthenticationEntryPoint authEntryPoint;
+    private final CustomCorsConfiguration customCorsConfiguration;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers(
-                        "/api/v1/moodbot/auth/**"
-                ).permitAll().anyRequest().authenticated())
+                        "/api/v1/moodbot/auth/register",
+                        "/api/v1/moodbot/auth/login",
+                        "/api/v1/moodbot/auth/verify",
+                        "/api/v1/moodbot/auth/confirm"
+                ).permitAll()
+                        .anyRequest().authenticated())
+                .cors(c -> c.configurationSource(customCorsConfiguration))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(Customizer.withDefaults())
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(authEntryPoint))
+                .logout(logout -> logout
+                        .logoutUrl("/api/v1/moodbot/auth/logout")
+                        .addLogoutHandler(customLogoutHandler)
+                        .logoutSuccessHandler(customLogoutSuccessHandler))
                 .build();
     }
 

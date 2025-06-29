@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.project.moodbotbackend.entity.UserPrincipal;
+import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ public class JwtService {
                     .signWith(generateKey())
                     .compact();
         } catch (JwtException e) {
-            throw new RuntimeException("failed to generate access token.");
+            throw new AuthException(500, "failed to generate access token.");
         }
 
     }
@@ -72,7 +73,7 @@ public class JwtService {
                     .signWith(generateKey())
                     .compact();
         } catch (JwtException e) {
-            throw new RuntimeException("failed to generate refresh token");
+            throw new AuthException(500, "failed to generate refresh token");
         }
     }
 
@@ -85,7 +86,7 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException e) {
-            throw new RuntimeException("this is an invalid token");
+            throw new AuthException(401, "this is an invalid token");
         }
     }
 

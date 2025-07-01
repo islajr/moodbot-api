@@ -20,7 +20,7 @@ This documentation explains how authentication has been implemented within this 
 
 This endpoint stands in front of the application and register users.
 
-This takes in a JSON object consisting of the necessary elements: username, e-mail and password, sends a confirmation mail containaing a seven-digit OTP to the provided e-mail address, and returns a JSON object of elements, message and e-mail. This endpoint **does not** require authentication.
+This takes in a JSON object consisting of the necessary elements: username, e-mail and password, sends a confirmation mail containaing a six-digit OTP to the provided e-mail address, and returns a JSON object of elements, message and e-mail. This endpoint **does not** require authentication.
 
 #### Request Example
 

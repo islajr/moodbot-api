@@ -138,7 +138,9 @@ Status Code: 401
 
 ### User Verify Endpoint
 
-This endpoint follows directly form the previous one as it is responsible for re-generating and sending OTPs for the confirmation of users that have not been confirmed. This endpoint does **not require** authentication.
+This endpoint follows directly form the previous one as it verifies the existence of the account and is responsible for re-generating and sending OTPs for the confirmation of users that have not been confirmed.
+This endpoint ensures that users are not locked out of their accounts, even if they do not remember their passwords.
+This endpoint does **not require** authentication.
 
 #### Request Example
 
@@ -162,6 +164,17 @@ Status Code: 200
         "message": "a confirmation code has been sent to your mail",
         "email": "someone@example.com"
     }
+
+```
+
+If user or e-mail is unvailiable:
+
+```
+Status Code: 400
+
+    {
+        "message": "user not found"
+}
 
 ```
 

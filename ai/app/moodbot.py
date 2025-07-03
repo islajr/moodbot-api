@@ -15,6 +15,7 @@ class MentalHealthChatbot:
         self.conversations = defaultdict(list)
         self.awaiting_talk_or_tech = defaultdict(lambda: None)
         self.awaiting_technique_consent = defaultdict(lambda: None)
+        self.handled_emotion = defaultdict(lambda: None)
         self.daily_checkins = {}  
         self.setup_system_prompt()
         self.coping_techniques = {
@@ -31,6 +32,14 @@ class MentalHealthChatbot:
             "sleep": ["can't sleep", "insomnia", "sleep issues", "restless"],
             "panic": ["panic", "panic attack", "freaking out"]
         }
+        self.empathy_phrases = {
+            "anxiety":   "It sounds like a lot is weighing on you right now. I'm really sorry you're feeling anxious.",
+            "stress":    "It seems you're under a great deal of pressure. I'm really sorry it's so stressful.",
+            "depression":"It sounds like things have been really tough lately. I'm sorry you're feeling down.",
+            "sleep":     "Not being able to rest can be exhausting. I'm sorry it's been so hard to sleep well.",
+            "panic":     "Panic can feel overwhelming. I'm sorry you're experiencing this."
+        }
+        
 
     def setup_system_prompt(self):
         self.conversations["system"].append({
@@ -131,22 +140,34 @@ class MentalHealthChatbot:
             self.conversations[user_id].append({"role": "assistant", "content": crisis_response})
             return crisis_response
         
-        # Handle talk/tech offer response
+        # Handle talk or tech offer response
         if self.awaiting_talk_or_tech[user_id]:
             category = self.awaiting_talk_or_tech[user_id]
             response = user_input.strip().lower()
 
-            if response in ["yes", "yeah", "sure", "ok", "okay"]:
-                self.awaiting_talk_or_tech[user_id] = None
-                return "I'm here for you. Take your time—what’s been on your mind lately? 💬"
+            wants_to_talk = bool(
+                re.search(r"\b(talk|chat|share|yes|yeah|yep|sure|ok|okay|please)\b", response)
+            )
+            wants_technique = bool(
+                re.search(r"\b(technique|exercise|calm|breath|ground|relax|try it|help)\b", response)
+            )
 
-            elif response in ["no", "not really", "nah"]:
+            if wants_to_talk:
+                # user chose to talk
+                self.awaiting_talk_or_tech[user_id] = None
+                return "I'm here for you. Take your time, what’s been on your mind lately? "
+
+            if wants_technique or response in ["no", "not really", "nah"]:
+                # user chose a technique (or declined talking)
                 self.awaiting_technique_consent[user_id] = category
                 self.awaiting_talk_or_tech[user_id] = None
-                return "Alright, would you like to try a calming technique instead?"
+                return "Alright. Would you like to try a calming technique together?"
 
-            else:
-                return "No pressure at all. Would you like to talk about it or try a calming technique?"
+            # if unclear, gently prompt again
+            return (
+                "No pressure at all. Would you like to talk a bit more about what’s weighing on you, "
+                "or would you prefer to try a short calming technique together? 💙"
+            )
 
         # Handle pending technique consent
         if self.awaiting_technique_consent[user_id]:
@@ -188,12 +209,32 @@ class MentalHealthChatbot:
             )
             ai_response = response.choices[0].message.content
 
-            # Check for emotional keywords and ask for consent
+            # Check for emotional keywords and add empathy and balanced follow-up
             category = self.detect_emotion_category(user_input)
-            if category:
+            if (
+                category
+                and not self.awaiting_talk_or_tech[user_id]
+                and not self.awaiting_technique_consent[user_id]
+                and self.handled_emotion[user_id] != category
+            ):
+                # add softener
+                empathy = self.empathy_phrases.get(
+                    category,
+                    "I'm really sorry you're feeling this way."
+                )
+                ai_response = f"{ai_response} {empathy}"
+
+                # queue next step (talk or technique)
                 self.awaiting_talk_or_tech[user_id] = category
-                follow_up = f"{ai_response}\n\nWould you like to talk about it?"
-                self.conversations[user_id].append({"role": "assistant", "content": follow_up})
+                self.handled_emotion[user_id] = category  # prevent repeating for same emotion
+                follow_up = (
+                    f"{ai_response}\n\n"
+                    "Would you like to talk a bit more about what’s weighing on you, "
+                    "or would you prefer to try a short calming technique together? 💙"
+                )
+                self.conversations[user_id].append(
+                    {"role": "assistant", "content": follow_up}
+                )
                 return follow_up
 
             # Otherwise, return normal response

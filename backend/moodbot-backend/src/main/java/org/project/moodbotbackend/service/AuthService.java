@@ -122,6 +122,10 @@ public class AuthService {
 
     public ResponseEntity<EmailConfirmResponseDTO> verify(String email) {
 
+        if (!authRepository.existsByEmail(email)) {
+            throw new AuthException(404, "no such user");
+        }
+
         tempCache.invalidate(email);
         String username = myUserDetailsService.loadUserByUsername(email).getUsername();
 

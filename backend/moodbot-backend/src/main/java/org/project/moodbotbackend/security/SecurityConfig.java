@@ -38,8 +38,13 @@ public class SecurityConfig {
                         "/api/v1/moodbot/auth/register",
                         "/api/v1/moodbot/auth/login",
                         "/api/v1/moodbot/auth/verify",
-                        "/api/v1/moodbot/auth/confirm"
-                ).permitAll()
+                        "/api/v1/moodbot/auth/confirm",
+                        "/swagger-ui/**",               // Swagger UI static resources
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",              // OpenAPI spec
+                        "/swagger-ui.html",             // Swagger main page
+                        "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated())
                 .cors(c -> c.configurationSource(customCorsConfiguration))
                 .formLogin(AbstractHttpConfigurer::disable)

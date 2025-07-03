@@ -31,7 +31,12 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/moodbot/auth/register",
             "/api/v1/moodbot/auth/login",
             "/api/v1/moodbot/auth/verify",
-            "/api/v1/moodbot/auth/confirm"
+            "/api/v1/moodbot/auth/confirm",
+            "/swagger-ui/**",               // Swagger UI static resources
+            "/v3/api-docs",
+            "/v3/api-docs/**",              // OpenAPI spec
+            "/swagger-ui.html",             // Swagger main page
+            "/webjars/**"
     );
     private final TokenService tokenService;
 
@@ -72,8 +77,8 @@ public class JwtFilter extends OncePerRequestFilter {
         } else {
             if (token != null)
                 throw new AuthException(401, "invalid token!");    // change to JwtException or custom later.
-            else
-                throw new AuthException(500, "problematic request!");    // problem with the request
+            /*else
+                throw new AuthException(500, "problematic request!");    // problem with the request*/
         }
 
         filterChain.doFilter(request, response);

@@ -46,12 +46,12 @@ async def websocket_chat(websocket: WebSocket, user_id: str):
         await websocket.send_json({
             "type": "welcome",
             "message": "MoodBot 🤖: Hi, I'm here for you. How are you feeling today?",
-            "instructions": "Type 'exit' or 'quit' to end chat"
+            "instructions": "Type 'bye', 'exit' or 'quit' to end chat"
         })
 
         while True:
             user_input = await websocket.receive_text()
-            if user_input.lower().strip() in ['exit', 'quit']:
+            if user_input.lower().strip() in ['bye', 'exit', 'quit']:
                 await websocket.send_json({
                     "type": "exit",
                     "message": "👋 Take care! MoodBot is always here when you need support."

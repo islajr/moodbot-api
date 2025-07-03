@@ -1,4 +1,4 @@
-package org.project.moodbotbackend.dto.auth;
+package org.project.moodbotbackend.dto.auth.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

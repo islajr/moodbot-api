@@ -24,18 +24,22 @@ public class User {
 
     @NotNull
     @Column(name = "username")
-    @Size(max = 20)
+    @Size(min = 1, max = 20)
     String username;
 
     @NotNull
     @Column(name = "email")
-    @Size(min = 1, max = 50)
+    @Size(min = 5, max = 50)
     String email;
 
     @NotNull
     @Column(name = "password")
     @Size(min = 8, max = 75)
     private String password;
+
+    @NotNull
+    @Column(name = "is_email_verified")
+    boolean isEmailVerified;
 
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

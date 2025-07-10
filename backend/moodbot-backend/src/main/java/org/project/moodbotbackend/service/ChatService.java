@@ -7,6 +7,7 @@ import org.project.moodbotbackend.entity.ChatMessage;
 import org.project.moodbotbackend.repository.ChatRepository;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Service
@@ -15,10 +16,10 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
 
-    public void saveMessage(ChatMessageDTO messageDTO, String sessionId) {
+    public void saveMessage(ChatMessageDTO messageDTO, String sessionId, Principal user) {
         ChatMessage message  = ChatMessage.builder()
                 .content(messageDTO.content())
-                .sender(messageDTO.sender())
+                .sender(user.getName())
                 .sessionId(sessionId)
                 .userId(messageDTO.userId())
                 .timestamp(LocalDateTime.now())

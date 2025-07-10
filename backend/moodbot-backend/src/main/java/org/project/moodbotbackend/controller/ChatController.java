@@ -9,6 +9,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 @Controller
 @AllArgsConstructor
 public class ChatController {
@@ -17,10 +19,10 @@ public class ChatController {
 
     @MessageMapping("/chat/{sessionId}")
     @SendTo("/topic/messages/{sessionId}")
-    public ChatMessageDTO respond(@DestinationVariable String sessionId, @Payload ChatMessageDTO chatMessageDTO) {
+    public ChatMessageDTO respond(@DestinationVariable String sessionId, @Payload ChatMessageDTO chatMessageDTO, Principal user) {
 
         // save user message
-        chatService.saveMessage(chatMessageDTO, sessionId);
+        chatService.saveMessage(chatMessageDTO, sessionId, user);
 
         // generate response
 

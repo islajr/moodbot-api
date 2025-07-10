@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @Getter
@@ -22,8 +23,7 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    String sender;
-    String content;
-
+    ArrayList<ChatMessage> messages = new ArrayList<>();
     LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 }

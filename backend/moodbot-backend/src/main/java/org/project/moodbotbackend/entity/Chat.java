@@ -1,13 +1,7 @@
 package org.project.moodbotbackend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,11 +11,19 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Builder
 public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    String sessionId;
+    String slug;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    User user;
 
     ArrayList<ChatMessage> messages = new ArrayList<>();
     LocalDateTime createdAt;

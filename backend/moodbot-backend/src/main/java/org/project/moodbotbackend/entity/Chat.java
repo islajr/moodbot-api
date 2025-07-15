@@ -28,4 +28,8 @@ public class Chat {
     ArrayList<ChatMessage> messages = new ArrayList<>();
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+
+    public void addMessage(ChatMessage message) {
+        messages.add(message);
+    }
 }

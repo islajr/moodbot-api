@@ -11,4 +11,5 @@ import java.util.ArrayList;
 public interface ChatRepository extends JpaRepository<Chat, String> {
 
     ArrayList<Chat> findChatsByUser(User user);
+    Chat findChatBySessionId(String sessionId);
 }

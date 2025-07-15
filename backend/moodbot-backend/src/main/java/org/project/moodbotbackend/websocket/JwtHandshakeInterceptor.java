@@ -2,14 +2,19 @@ package org.project.moodbotbackend.websocket;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.project.moodbotbackend.entity.Chat;
+import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
-import org.project.moodbotbackend.exceptions.auth.AuthException;
+import org.project.moodbotbackend.repository.AuthRepository;
+import org.project.moodbotbackend.repository.ChatRepository;
+import org.project.moodbotbackend.service.ChatService;
 import org.project.moodbotbackend.service.JwtService;
 import org.project.moodbotbackend.service.MyUserDetailsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -22,6 +27,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     private final JwtService jwtService;
     private final MyUserDetailsService myUserDetailsService;
+    private final AuthRepository authRepository;
+    private final ChatService chatService;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
@@ -32,9 +39,9 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
             // getting principal from token.
             String email = jwtService.extractEmail(token);
-
             UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(email);
 
+            // load username into Principal for use in controller and service classes
             if (userPrincipal != null && jwtService.verifyToken(token, userPrincipal)) {
                 String username = userPrincipal.getUsername();
                 attributes.put("username", username);
@@ -48,6 +55,21 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
+        // create new chat instance
+        String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
+
+        User user = authRepository.findUserByEmail(email);
+
+        Chat chat = Chat.builder()
+                .user(user)
+                .build();
+
+        // cache empty chat.
+        if (chatService.newChats.getIfPresent(user.getUsername()) != null) {
+            chatService.newChats.invalidate(user.getUsername());    // delete any existing chats in cache
+        }
+        chatService.newChats.put(user.getUsername(), chat);
 
     }
 }

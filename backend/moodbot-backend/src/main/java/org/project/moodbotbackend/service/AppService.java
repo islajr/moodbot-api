@@ -2,21 +2,36 @@ package org.project.moodbotbackend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.project.moodbotbackend.dto.app.AppResponse;
+import org.project.moodbotbackend.entity.Chat;
+import org.project.moodbotbackend.entity.User;
+import org.project.moodbotbackend.entity.UserPrincipal;
+import org.project.moodbotbackend.repository.AuthRepository;
 import org.project.moodbotbackend.repository.ChatRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
 public class AppService {
 
+    private final MyUserDetailsService myUserDetailsService;
+    private final AuthRepository authRepository;
     private final ChatRepository chatRepository;
 
-    public AppResponse generateMainPage() {
+    public ResponseEntity<AppResponse> generateMainPage() {
 
-        // obtain username from securityContextHolder
-        // peruse the chat repository for 'chats'
+        // obtain email from securityContextHolder
+        String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
+        String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
 
-        // build a response to return using the builder notation
-        return new AppResponse(null);
+        User user = authRepository.findUserByEmail(email);
+        ArrayList<Chat> chats = chatRepository.findChatsByUser(user);
+
+        return ResponseEntity.ok(AppResponse.builder()
+                .chats(chats)
+                .build());
     }
 }

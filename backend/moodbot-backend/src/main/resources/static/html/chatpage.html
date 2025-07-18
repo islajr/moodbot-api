@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodBot</title>
+</head>
+<body>
+    <header>Moodbot</header>
+    <main>
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="sidebar-container">
+                    <div class="functions">
+                        <button id="create-chat-room" onclick="
+                            document.getElementById('chat-area').hidden=false;
+                            ">New Chat</button>
+                    </div>
+                    <div class="history">
+                        <h2>Chat History</h2>
+                        <ul id="chat-history">
+                            <!-- <li class="chat-room" onclick="openChatRoom('room1')">Chat Room 1</li>
+                            <li class="chat-room" onclick="openChatRoom('room2')">Chat Room 2</li>
+                            <li class="chat-room" onclick="openChatRoom('room3')">Chat Room 3</li> -->
+                        <!-- Chat rooms will be dynamically populated here -->
+                        </ul>
+                    </div>
+                    
+                </div>
+            </aside>
+            <div id="chat-area" hidden>
+                <div class="chat-area-container">
+                    <form action="prompt" method="post">
+                        <label for="prompt">How do you feel?</label>
+                        <input type="text" id="prompt" name="prompt" required>
+                        <button type="submit"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="../js/chat.js"></script>
+</body>
+</html>

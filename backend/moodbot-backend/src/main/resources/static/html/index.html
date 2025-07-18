@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodBot Prototyping</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header><h1>MoodBot</h1></header>
+    <main>
+        <div class="main-container">
+            <form action="sign-up" method="post" id="sign-up-form">
+                <h2>Sign Up</h2>
+                <label for="username">Username:</label>
+                <input type="text" id="signup-username" name="username" required min="3" max="20">
+
+                <label for="email">E-mail:</label>
+                <input type="email" name="signup-e-mail" id="e-mail" required min="5" max="50">
+                
+                <label for="password">Password:</label>
+                <input type="password" id="signup-password" name="password" required min="8" max="75" a>
+                
+                <button type="submit">Sign Up</button>
+            </form>
+
+            <h4>Already have an account?
+                + Click <a href="#" onclick="
+            document.getElementById('login-form').hidden=false;">here</a></h2>
+
+            <form action="login" method="post" hidden id="login-form">
+                <h2>Login</h2>
+                <label for="login-identifier">Identifier:</label>
+                <input type="text" id="login-identifier" name="identifier" required min="3" max="20" placeholder="Username or E-mail">
+
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" name="password" required min="8" max="75">
+
+                <button type="submit">Login</button>
+
+        </div>
+    </main>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

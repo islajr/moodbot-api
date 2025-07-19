@@ -14,13 +14,13 @@
                 <div class="auth-container">
                     <h2>Sign Up</h2>
                     <label for="username">Username:</label>
-                    <input type="text" id="signup-username" name="username" required min="3" max="20">
+                    <input type="text" id="signup-username" name="username" required minlength="3" maxlength="20">
 
                     <label for="email">E-mail:</label>
-                    <input type="email" name="signup-e-mail" id="e-mail" required min="5" max="50">
+                    <input type="email" name="signup-e-mail" id="e-mail" required minlength="5" maxlength="50">
                     
                     <label for="password">Password:</label>
-                    <input type="password" id="signup-password" name="password" required min="8" max="75" a>
+                    <input type="password" id="signup-password" name="password" required minlength="8" maxlength="75" a>
                     
                     <button type="submit">Sign Up</button>
                     
@@ -37,10 +37,10 @@
                 <div class="auth-container">
                     <h2>Login</h2>
                     <label for="login-identifier">Username or E-mail:</label>
-                    <input type="text" id="login-identifier" name="identifier" required min="3" max="20">
+                    <input type="text" id="login-identifier" name="identifier" required minlength="3" maxlength="20">
 
                     <label for="login-password">Password:</label>
-                    <input type="password" id="login-password" name="password" required min="8" max="75">
+                    <input type="password" id="login-password" name="password" required minlength="8" maxlength="75">
 
                     <button type="submit">Login</button>
 
@@ -52,19 +52,19 @@
             </form>
 
             <!-- E-mail confirmation component -->
-             <div id="email-confirmation" hidden>
+             <div id="email-confirmation" >
                 <div class="confirmation-container">
                     <h2>E-mail Confirmation</h2>
                     <p>Please provide the OTP sent to your e-mail address:</p>
                     <label for="otp" id="otp-container">
                         <!-- <input type="text" id="otp" name="otp" required min="6" max="6"> -->
-                        <input type="text" name="" id="otp-1" class="otp-input">
-                        <input type="text" name="" id="otp-2" class="otp-input">
-                        <input type="text" name="" id="otp-3" class="otp-input">
-                        <input type="text" name="" id="otp-4" class="otp-input">
+                        <input type="text" name="otp-1" id="otp-1" class="otp-input" maxlength="1">
+                        <input type="text" name="otp-2" id="otp-2" class="otp-input" maxlength="1">
+                        <input type="text" name="otp-3" id="otp-3" class="otp-input" maxlength="1">
+                        <input type="text" name="otp-4" id="otp-4" class="otp-input" maxlength="1">
                     </label>
                     
-                    <button type="submit" id="confirm-otp">Confirm OTP</button>
+                    <button type="submit" id="confirm-otp" name="confirm">Confirm OTP</button>
                     <p id="resend-otp">Didn't receive the OTP? <a href="#" onclick="resendOtp()">Resend OTP</a></p>
                 </div>
              </div>

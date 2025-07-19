@@ -86,7 +86,7 @@ public class AuthService {
                         return generateToken(email);
                     }
                     throw new AuthException(400, "incorrect details");
-                } throw new AuthException(401, "please verify your e-mail first");
+                } throw new AuthException(401, "please verify your e-mail first");  // return e-mail address for compulsory confirmation upon login
 
         } throw new AuthException(404, "no such user.");
 

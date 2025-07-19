@@ -23,8 +23,9 @@ signupForm.addEventListener('submit', function(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Signup successful! Please log in.');
-            // Optionally redirect to login page
+            alert('Signup successful!');
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
             window.location.href = '/chatpage';
         } else {
             alert(data.message);
@@ -52,6 +53,9 @@ loginForm.addEventListener('submit', function(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            alert("login successful!");
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
             window.location.href = '/chatpage';
         } else {
             alert(data.message);
@@ -59,4 +63,27 @@ loginForm.addEventListener('submit', function(event) {
     })
     .catch(error => console.error('Error:', error));
 });
+
+/* accessibility logic */
+const otpContainer = document.getElementById('otp-container');
+const otpInput = document.querySelectorAll('.otp-input');
+
+otpInput.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+        if (e.target.value >=0 && e.target.value <= 9) {
+
+            if (input.value.length === 1 && index < otpInput.length - 1) {
+                otpInput[index + 1].focus();
+            }
+        } else {
+            input.value = '';
+        }
+    })
+
+    input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && index > 0 && input.value === '') {
+                otpInput[index - 1].focus();
+            }
+        });
+})
 

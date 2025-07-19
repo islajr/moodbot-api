@@ -37,14 +37,16 @@ signUp.addEventListener('click', function(event) {
                 alert(`OTP sent to ${otpData.email}. Please check your email.`);
 
                 // hide signup and login forms; show email confirmation
-                signupForm.hidden = true;
-                loginForm.hidden = true;
-                emailConfirmation.hidden = false;
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'none';
+                emailConfirmation.style.display = 'flex';
                 
                 // add event listener for OTP submission
                 const otpSubmit = document.getElementById('confirm-otp');
-                otpSubmit.addEventListener('submit', async function(otpEvent) {
+                otpSubmit.addEventListener('click', async function(otpEvent) {
                     otpEvent.preventDefault();
+
+                    // collect OTP values from input fields
                     const otpInputs = document.querySelectorAll('.otp-input');
                     let otp = '';
                     otpInputs.forEach(input => {
@@ -99,7 +101,7 @@ signUp.addEventListener('click', function(event) {
             alert('An error occurred while sending the OTP. Please try again.');
         }
     }
-    
+    // call the function to get OTP
     getOTP();
     
 });
@@ -108,7 +110,7 @@ signUp.addEventListener('click', function(event) {
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault(); // prevent default form submission
 });
-loginForm.addEventListener('submit', function(event) {
+loginForm.addEventListener('click', function(event) {
     event.preventDefault();
     const identifier = document.getElementById('login-identifier').value;
     const password = document.getElementById('login-password').value;

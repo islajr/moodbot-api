@@ -10,32 +10,32 @@
     <header><h1>MoodBot</h1></header>
     <main>
         <div class="main-container">
-            <form action="sign-up" method="post" id="sign-up-form">
-                <div class="auth-container">
-                    <h2>Sign Up</h2>
-                    <label for="username">Username:</label>
+            <div class="auth-container" id="sign-up-container">
+                <h2>Sign Up</h2>
+                <form action="" method="post" id="sign-up-form">
+                    <label for="signup-username">Username:</label>
                     <input type="text" id="signup-username" name="username" required minlength="3" maxlength="20">
 
-                    <label for="email">E-mail:</label>
-                    <input type="email" name="signup-e-mail" id="e-mail" required minlength="5" maxlength="50">
+                    <label for="signup-e-mail">E-mail:</label>
+                    <input type="email" name="signup-e-mail" id="signup-e-mail" required minlength="5" maxlength="50">
                     
-                    <label for="password">Password:</label>
-                    <input type="password" id="signup-password" name="password" required minlength="8" maxlength="75" a>
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" name="signup-password" required minlength="8" maxlength="75" a>
                     
-                    <button type="submit">Sign Up</button>
+                    <button type="submit" id="signup-submit-button">Sign Up</button>
                     
                     <h4 id="login-prompt">Already have an account?
                     + Click <a href="#" onclick="
-                    document.getElementById('login-form').hidden=false;
-                    document.getElementById('sign-up-form').hidden=true">here</a></h4>
-                </div>
-            </form>
+                    document.getElementById('login-container').style.display='flex';
+                    document.getElementById('sign-up-container').style.display='none'">here</a></h4>
+                
+                </form>
+            </div>
 
-            
-
-            <form action="login" method="post" hidden id="login-form">
-                <div class="auth-container">
-                    <h2>Login</h2>
+            <!-- Login form -->
+             <div class="auth-container" id="login-container" hidden>
+                <h2>Login</h2>
+                <form action="" method="post" hidden id="login-form">
                     <label for="login-identifier">Username or E-mail:</label>
                     <input type="text" id="login-identifier" name="identifier" required minlength="3" maxlength="20">
 
@@ -46,10 +46,10 @@
 
                     <h4 id="login-prompt">Don't have an account?
                     + Click <a href="#" onclick="
-                    document.getElementById('login-form').hidden=true;
-                    document.getElementById('sign-up-form').hidden=false">here</a></h4>
-                </div>
-            </form>
+                    document.getElementById('login-container').style.display='none';
+                    document.getElementById('sign-up-container').style.display='flex'">here</a></h4>
+                </form>
+             </div>
 
             <!-- E-mail confirmation component -->
              <div id="email-confirmation" hidden>

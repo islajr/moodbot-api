@@ -49,6 +49,25 @@
                     document.getElementById('login-form').hidden=true;
                     document.getElementById('sign-up-form').hidden=false">here</a></h4>
                 </div>
+            </form>
+
+            <!-- E-mail confirmation component -->
+             <div id="email-confirmation">
+                <div class="confirmation-container">
+                    <h2>E-mail Confirmation</h2>
+                    <p>Please provide the OTP sent to your e-mail address:</p>
+                    <label for="otp" id="otp-container">
+                        <!-- <input type="text" id="otp" name="otp" required min="6" max="6"> -->
+                        <input type="text" name="" id="otp-1" class="otp-input">
+                        <input type="text" name="" id="otp-2" class="otp-input">
+                        <input type="text" name="" id="otp-3" class="otp-input">
+                        <input type="text" name="" id="otp-4" class="otp-input">
+                    </label>
+                    
+                    <button type="submit" id="confirm-otp">Confirm OTP</button>
+                    <p id="resend-otp">Didn't receive the OTP? <a href="#" onclick="resendOtp()">Resend OTP</a></p>
+                </div>
+             </div>
                 
 
         </div>

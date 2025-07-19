@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodBot</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <header>Moodbot</header>
+    <header><h1>MoodBot</h1></header>
     <main>
         <div class="main-container">
             <aside class="sidebar">
@@ -28,12 +29,12 @@
                     
                 </div>
             </aside>
-            <div id="chat-area" hidden>
+            <div id="chat-area">
                 <div class="chat-area-container">
-                    <form action="prompt" method="post">
+                    <form action="prompt" method="post" id="chat-form">
                         <label for="prompt">How do you feel?</label>
-                        <input type="text" id="prompt" name="prompt" required>
-                        <button type="submit"></button>
+                        <input type="text" id="prompt" name="prompt" required autocorrect="on" a>
+                        <button type="submit">Enter</button>
                     </form>
                 </div>
             </div>

@@ -1,12 +1,9 @@
 package org.project.moodbotbackend.websocket;
 
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import org.project.moodbotbackend.entity.Chat;
-import org.project.moodbotbackend.entity.User;
+import java.util.Map;
+
 import org.project.moodbotbackend.entity.UserPrincipal;
 import org.project.moodbotbackend.repository.AuthRepository;
-import org.project.moodbotbackend.repository.ChatRepository;
 import org.project.moodbotbackend.service.ChatService;
 import org.project.moodbotbackend.service.JwtService;
 import org.project.moodbotbackend.service.MyUserDetailsService;
@@ -14,12 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
@@ -55,7 +52,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-        // create new chat instance
+       /*  // create new chat instance
         String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
         String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
 
@@ -69,7 +66,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         if (chatService.newChats.getIfPresent(user.getUsername()) != null) {
             chatService.newChats.invalidate(user.getUsername());    // delete any existing chats in cache
         }
-        chatService.newChats.put(user.getUsername(), chat);
+        chatService.newChats.put(user.getUsername(), chat); */
 
     }
 }

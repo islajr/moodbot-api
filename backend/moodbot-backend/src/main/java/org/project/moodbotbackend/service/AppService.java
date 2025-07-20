@@ -1,6 +1,7 @@
 package org.project.moodbotbackend.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+
 import org.project.moodbotbackend.dto.app.AppResponse;
 import org.project.moodbotbackend.entity.Chat;
 import org.project.moodbotbackend.entity.User;
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,5 +34,14 @@ public class AppService {
         return ResponseEntity.ok(AppResponse.builder()
                 .chats(chats)
                 .build());
+    }
+
+    public ResponseEntity<Chat> getChat(String sessionId) {
+        Chat chat =  chatRepository.findChatBySessionId(sessionId);
+        if (chat == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(chat);
     }
 }

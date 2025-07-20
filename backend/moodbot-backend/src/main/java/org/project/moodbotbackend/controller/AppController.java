@@ -1,10 +1,13 @@
 package org.project.moodbotbackend.controller;
 
 import lombok.RequiredArgsConstructor;
+
 import org.project.moodbotbackend.dto.app.AppResponse;
+import org.project.moodbotbackend.entity.Chat;
 import org.project.moodbotbackend.service.AppService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,5 +21,10 @@ public class AppController {
     @GetMapping
     public ResponseEntity<AppResponse> getMainPage() {
         return appService.generateMainPage();
+    }
+
+    @GetMapping("/{sessionId}")
+    public ResponseEntity<Chat> getChat(@PathVariable String sessionId) {
+        return appService.getChat(sessionId);
     }
 }

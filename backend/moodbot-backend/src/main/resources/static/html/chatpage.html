@@ -29,9 +29,9 @@
                     
                 </div>
             </aside>
-            <div id="chat-area">
+            <div id="chat-area" hidden>
                 <div class="chat-area-container">
-                    <form action="prompt" method="post" id="chat-form">
+                    <form action="" method="post" id="chat-form">
                         <label for="prompt">How do you feel?</label>
                         <input type="text" id="prompt" name="prompt" required autocorrect="on" a>
                         <button type="submit">Enter</button>
@@ -40,6 +40,8 @@
             </div>
         </div>
     </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="../js/chat.js"></script>
 </body>
 </html>

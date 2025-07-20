@@ -1,5 +1,7 @@
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('sign-up-form');
+const signupContainer = document.getElementById('sign-up-container');
+const loginContainer = document.getElementById('login-container');
 const signUp = document.getElementById('signup-submit-button');
 const emailConfirmation = document.getElementById('email-confirmation');
 const globalURL = "https://moodbot-api.onrender.com";
@@ -160,11 +162,11 @@ loginForm.addEventListener('submit', function(event) {
                             switch (triggerVerification.status) {
                                 case Number(201):
                                     alert("Please check your email for the OTP to verify your account.");
-                                    signupForm.style.display = 'none';
-                                    loginForm.style.style.display = 'none';
-                                    emailConfirmation.style.display = 'flex';
+                                    signupContainer.style.display = 'none';
+                                    loginContainer.style.style.display = 'none';
+                                    emailConfirmation.hidden = false;
                                     const otpSubmit = document.getElementById('confirm-otp');
-                                    otpSubmit.addEventListener('click', async function(otpEvent) {
+                                    otpSubmit.addEventListener('submit', async function(otpEvent) {
                                         otpEvent.preventDefault();
                                         let otp = getOTP(); // get OTP from input fields
                                         try {
@@ -213,6 +215,7 @@ loginForm.addEventListener('submit', function(event) {
                                 default:
                                     alert("An error occurred while verifying your email. Please try again later.");
                                     break;
+                                    
                         }
                     }
                         catch (error) {

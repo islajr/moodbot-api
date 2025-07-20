@@ -4,7 +4,8 @@ const signupContainer = document.getElementById('sign-up-container');
 const loginContainer = document.getElementById('login-container');
 const signUp = document.getElementById('signup-submit-button');
 const emailConfirmation = document.getElementById('email-confirmation');
-const globalURL = "https://moodbot-api.onrender.com";
+// const globalURL = "https://moodbot-api.onrender.com";
+const globalURL = "http://localhost:8080";
 
 /* functions */
 
@@ -131,6 +132,7 @@ loginForm.addEventListener('submit', function(event) {
         try {
             const loginResponse = await fetch(globalURL + '/api/v1/moodbot/auth/login', {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },

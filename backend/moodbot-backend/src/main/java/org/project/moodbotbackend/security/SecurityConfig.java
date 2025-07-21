@@ -44,7 +44,9 @@ public class SecurityConfig {
                         "/v3/api-docs",
                         "/v3/api-docs/**",              // OpenAPI spec
                         "/swagger-ui.html",             // Swagger main page
-                        "/webjars/**"
+                        "/webjars/**",
+                                "/chat",
+                                "/chat/**"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .cors(c -> c.configurationSource(customCorsConfiguration))

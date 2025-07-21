@@ -132,7 +132,6 @@ loginForm.addEventListener('submit', function(event) {
         try {
             const loginResponse = await fetch(globalURL + '/api/v1/moodbot/auth/login', {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },

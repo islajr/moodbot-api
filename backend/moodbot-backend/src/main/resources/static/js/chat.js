@@ -62,7 +62,7 @@ function onMessageReceived() {
 chatForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const promptInput = document.getElementById('prompt');
-    const socket = new SocketJs(globalURL +"/chat");
+    const socket = new SockJS(globalURL +"/chat");
     stompClient = Stomp.over(socket);
     stompClient.connect({ Authorization: `Bearer ${accessToken}` }, (frame) => {
         // on connected...

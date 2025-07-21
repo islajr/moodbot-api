@@ -18,8 +18,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/chat")
-                .addInterceptors(jwtHandshakeInterceptor)
-                .setAllowedOriginPatterns("*")
+//                .addInterceptors(jwtHandshakeInterceptor)
+                .setAllowedOriginPatterns("http://localhost:63342")
                 .withSockJS();
     }
 

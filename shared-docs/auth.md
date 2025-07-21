@@ -25,7 +25,7 @@ This takes in a JSON object consisting of the necessary elements: username, e-ma
 #### Request Example
 
 ```
-/api/v1/moodbot/auth/register
+POST /api/v1/moodbot/auth/register
 
     {
         "username": "someUsername",
@@ -64,7 +64,7 @@ This endpoint serves to confirm OTPs sent to e-mails for whatever purpose within
 #### Request Example
 
 ```
-/api/v1/moodbot/auth/confirm
+POST /api/v1/moodbot/auth/confirm
 
     {
         "email": "someemail@email.com",
@@ -92,7 +92,7 @@ This endpoint serves to welcome already registered users to the application. It 
 #### Request Example
 
 ```
-/api/v1/moodbot/auth/login
+POST /api/v1/moodbot/auth/login
 
     {
         "identifier": "username or email",
@@ -138,12 +138,14 @@ Status Code: 401
 
 ### User Verify Endpoint
 
-This endpoint follows directly form the previous one as it is responsible for re-generating and sending OTPs for the confirmation of users that have not been confirmed. This endpoint does **not require** authentication.
+This endpoint follows directly form the previous one as it verifies the existence of the account and is responsible for re-generating and sending OTPs for the confirmation of users that have not been confirmed.
+This endpoint ensures that users are not locked out of their accounts, even if they do not remember their passwords.
+This endpoint does **not require** authentication.
 
 #### Request Example
 
 ```
-/api/v1/moodbot/auth/verify
+POST /api/v1/moodbot/auth/verify
 
     {
         "email": "someone@email.com"
@@ -165,6 +167,17 @@ Status Code: 200
 
 ```
 
+If user or e-mail is unvailiable:
+
+```
+Status Code: 400
+
+    {
+        "message": "user not found"
+}
+
+```
+
 ### Token Refresh Endpoint
 
 This endpoint refreshes the access token, invalidates the previous one, and provides a new refresh token altogether. Authentication is **required** for this endpoint.
@@ -174,7 +187,7 @@ This endpoint refreshes the access token, invalidates the previous one, and prov
 This request has an empty body.
 
 ```
-/api/v1/moodbot/auth/refresh
+POST /api/v1/moodbot/auth/refresh
 
     {
 
@@ -203,7 +216,7 @@ This endpoint lets users reset their passwords. It requires authentication
 #### Request Example
 
 ```
-/api/v1/moodbot/reset/username
+PATCH /api/v1/moodbot/reset/username
 
     {
         "username: "myUsername"
@@ -252,7 +265,7 @@ This endpoint lets users reset their password, subject to an e-mail verification
 #### Request Example
 
 ```
-/api/v1/moodbot/reset/password
+PATCH /api/v1/moodbot/reset/password
 
     {
         "password": "newPassword"
@@ -280,7 +293,7 @@ This endpoint serves as an e-mail verification endpoint for all email-dependent 
 #### Request Example
 
 ```
-/api/v1/moodbot/reset/verify?action=<email|password>
+PATCH /api/v1/moodbot/reset/verify?action=<email|password>
 
     {
         "code": *******
@@ -330,7 +343,7 @@ This endpoint lets users reset their email, subject to an e-mail verification on
 #### Request Example
 
 ```
-/api/v1/moodbot/reset/email
+PATCH /api/v1/moodbot/reset/email
 
     {
         "email": "newEmail"

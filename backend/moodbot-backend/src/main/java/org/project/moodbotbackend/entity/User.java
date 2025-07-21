@@ -29,7 +29,7 @@ public class User {
 
     @NotNull
     @Column(name = "email")
-    @Size(min = 5, max = 50)
+    @Size(min = 5, max = 100)
     String email;
 
     @NotNull

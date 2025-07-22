@@ -70,7 +70,9 @@ chatForm.addEventListener('submit', (e) => {
 
         // subscribe to the topic with session ID
         const sessionId = generateSessionId();
-        stompClient.subscribe(`/topic/messages${sessionId}`, onMessageReceived());
+        stompClient.subscribe(`/topic/messages${sessionId}`, onMessageReceived(), {
+            "Authorization": `Bearer ${accessToken}`
+        });
 
         // send the prompt to the server
         const prompt = promptInput.value;

@@ -32,6 +32,7 @@ public class ChatController {
 
         // return response
         // return null;
+
         return new ChatMessageDTO(
                 sessionId,
                 1L,

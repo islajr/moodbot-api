@@ -52,7 +52,12 @@ function generateSessionId() {
 }
 
 // Function to handle incoming messages
-function onMessageReceived() {
+function onMessageReceived(payload) {
+
+    message = JSON.parse(payload.body);
+    console.log(message);
+    alert(`moodbot says: ${message.content}`);
+
     // display the message in the chat area
     // add listener to the submit button
     //
@@ -70,7 +75,7 @@ chatForm.addEventListener('submit', (e) => {
 
         // subscribe to the topic with session ID
         const sessionId = generateSessionId();
-        stompClient.subscribe(`/topic/messages${sessionId}`, onMessageReceived(), {
+        stompClient.subscribe(`/topic/messages/${sessionId}`, onMessageReceived, {
             "Authorization": `Bearer ${accessToken}`
         });
 

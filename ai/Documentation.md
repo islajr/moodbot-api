@@ -60,41 +60,13 @@ Receives a user's message and returns the chatbot’s response + a short topic s
 
 ---
 
-### WebSocket `/ws/{user_id}`
-
-Supports real-time communication with the chatbot.
-
-#### Connect URL
-```
-ws://localhost:8000/ws/{user_id}
-```
-
-#### Client Message Format
-
-```json
-{
-  "message": "I'm feeling anxious"
-}
-```
-
-#### Server Response Format
-
-```json
-{
-  "bot_response": "It’s okay to feel anxious. Do you want to talk or try a calming technique?",
-  "slug": "feeling anxious"
-}
-```
-
----
-
 ## Slug Generation
 
 A slug is a short GPT-generated summary of the user's message. It helps tag or label conversations.
 
 - Maximum 5 words
 - Relevant to the user's message
-- Included in both REST and WebSocket responses
+- Included in REST response
 
 Example slugs:  
 ✅ `"feeling overwhelmed"`  
@@ -136,7 +108,7 @@ http://localhost:8000/docs
 ## File Structure
 
 ```bash
-├── main.py              # FastAPI app + WebSocket
+├── main.py              # FastAPI app
 ├── ai_service.py        # GPT logic and chatbot interface
 ├── moodbot.py           # MentalHealthChatbot class
 ├── models.py            # Pydantic schemas
@@ -147,10 +119,10 @@ http://localhost:8000/docs
 
 ## Notes
 
+- WebSocket support has been removed.
 - No authentication is required currently.
 - Rate limiting has been **removed**.
 - CORS is enabled for all origins.
 - Slug is powered by GPT-4o-mini from OpenAI.
 
 ---
-

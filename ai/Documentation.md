@@ -22,6 +22,8 @@ http://localhost:8000
 
 Receives a user's message and returns the chatbot’s response + a short topic slug.
 
+> **This single endpoint is used for both chatbot response generation and slug creation.**
+
 #### Request Body
 
 ```json
@@ -66,7 +68,7 @@ A slug is a short GPT-generated summary of the user's message. It helps tag or l
 
 - Maximum 5 words
 - Relevant to the user's message
-- Included in REST response
+- Included in the `/chat/` response
 
 Example slugs:  
 ✅ `"feeling overwhelmed"`  

@@ -1,6 +1,7 @@
 package org.project.moodbotbackend.websocket;
 
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
 import org.project.moodbotbackend.exceptions.auth.AuthException;
@@ -12,14 +13,13 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Collections;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -44,43 +44,23 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
                 User user = validateAndGetUser(token);
 
                 if (user != null) {
+                    /* Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        user.getEmail(),
+                        user.getPassword(),
+                        Collections.singleton(new SimpleGrantedAuthority("USER"))
+                    ); */
+                    UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(user.getEmail());
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userPrincipal,
+                        null,
+                        userPrincipal.getAuthorities()
+                    );
+                    headerAccessor.setUser(authentication);
+
                     // set authenticated user in spring security context
-                    SecurityContextHolder.getContext().setAuthentication(new Authentication() {
-                        @Override
-                        public Collection<? extends GrantedAuthority> getAuthorities() {
-                            return Collections.singleton(new SimpleGrantedAuthority("USER"));
-                        }
-
-                        @Override
-                        public Object getCredentials() {
-                            return user.getPassword();
-                        }
-
-                        @Override
-                        public Object getDetails() {
-                            return myUserDetailsService.loadUserByUsername(user.getUsername()); // could be null
-                        }
-
-                        @Override
-                        public Object getPrincipal() {
-                            return myUserDetailsService.loadUserByUsername(user.getUsername());
-                        }
-
-                        @Override
-                        public boolean isAuthenticated() {
-                            return true;
-                        }
-
-                        @Override
-                        public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
-                        }
-
-                        @Override
-                        public String getName() {
-                            return user.getUsername();
-                        }
-                    });
+                   /* SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authentication);
+                    SecurityContextHolder.setContext(context);*/
                 }
             }
         }

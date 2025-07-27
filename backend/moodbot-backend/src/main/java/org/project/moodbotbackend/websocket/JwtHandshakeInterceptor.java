@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -31,19 +33,26 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest req = servletRequest.getServletRequest();
-            String authHeader = req.getHeader("Authorization");
-            String token = authHeader.substring(7);     // 7 being the length of "Bearer "
+//            String authHeader = req.getHeader("Authorization");
+            String token = req.getParameter("token");     // read from query params
 
             // getting principal from token.
-            String email = jwtService.extractEmail(token);
-            UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(email);
+            if (token != null) {
+                String email = jwtService.extractEmail(token);
+                UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(email);
 
-            // load username into Principal for use in controller and service classes
-            if (userPrincipal != null && jwtService.verifyToken(token, userPrincipal)) {
-                String username = userPrincipal.getUsername();
-                attributes.put("username", username);
-                return true;
-            }
+                // load username into Principal for use in controller and service classes
+                if (userPrincipal != null && jwtService.verifyToken(token, userPrincipal)) {
+                    /*String username = userPrincipal.getUsername();
+                    attributes.put("username", username);*/
+                    Authentication auth = new UsernamePasswordAuthenticationToken(
+                            userPrincipal, null, userPrincipal.getAuthorities()
+                    );
+                    attributes.put("user", auth);
+                    return true;
+                }
+            } response.setStatusCode(HttpStatus.BAD_REQUEST);
+
         }
 
         response.setStatusCode(HttpStatus.UNAUTHORIZED);

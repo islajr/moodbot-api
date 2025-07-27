@@ -4,11 +4,13 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 
 import org.project.moodbotbackend.dto.app.ChatMessageDTO;
+import org.project.moodbotbackend.entity.UserPrincipal;
 import org.project.moodbotbackend.service.ChatService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import lombok.AllArgsConstructor;
@@ -33,10 +35,13 @@ public class ChatController {
         // return response
         // return null;
 
+        Authentication authentication = (Authentication) user;
+
         return new ChatMessageDTO(
                 sessionId,
                 1L,
-                "BOT",
+                // "BOT",
+                authentication.getName(),
                 "this is a bare response",
                 LocalDateTime.now()
         );

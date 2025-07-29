@@ -109,9 +109,9 @@ class MentalHealthChatbot:
     
     def get_crisis_response(self, level):
         responses = {
-            "high": "🚨 **IMMEDIATE HELP NEEDED**: 📞 Call 08091116264 or your local emergency line. You're not alone. 💙",
-            "medium": "⚠️ Please reach out to your doctor or a trusted person. Want help finding local resources?",
-            "low": "❤️ I hear you're feeling down. Would you like to talk, try a calming technique, or get info on help?"
+            "high": "**IMMEDIATE HELP NEEDED**: 📞 Call 08091116264 or your local emergency line. You're not alone. 💙",
+            "medium": "Please reach out to your doctor or a trusted person. Want help finding local resources?",
+            "low": "I hear you're feeling down. Would you like to talk, try a calming technique, or get info on help?"
         }
         return responses.get(level, responses["low"])
     
@@ -134,12 +134,12 @@ class MentalHealthChatbot:
         return "unspecified"
     
     def get_chat_response(self, user_id, user_input):
-    # 🚨 Crisis check
-    crisis_response = self.check_for_crisis(user_input)
-    if crisis_response:
-        self.conversations[user_id].append({"role": "assistant", "content": crisis_response})
-        return crisis_response
-    
+        # Crisis check
+        crisis_response = self.check_for_crisis(user_input)
+        if crisis_response:
+            self.conversations[user_id].append({"role": "assistant", "content": crisis_response})
+            return crisis_response
+
         # Handle talk or technique offer response
         if self.awaiting_talk_or_tech[user_id]:
             category = self.awaiting_talk_or_tech[user_id]
@@ -179,19 +179,17 @@ class MentalHealthChatbot:
         # Save user message
         self.conversations[user_id].append({"role": "user", "content": user_input})
 
-        # Daily mood check-in — greet ONCE
+        # Daily mood check-in
         if user_id not in self.daily_checkins:
-            # First interaction of the day
             self.daily_checkins[user_id] = datetime.now()
             mood = self.extract_mood(user_input)
 
             if mood != "unspecified":
                 print(f"\nMood logged for {user_id} today: {mood}")
             else:
-                # Send the greeting ONCE
                 greeting = "Hello, welcome to MoodBot! Before we chat, how are you feeling today?"
                 self.conversations[user_id].append({"role": "assistant", "content": greeting})
-                
+                return greeting
 
         # Generate AI response regardless of mood status
         try:
@@ -203,7 +201,7 @@ class MentalHealthChatbot:
             )
             ai_response = response.choices[0].message.content
 
-            # Check for emotional keywords and add empathy
+            # Add empathy if needed
             category = self.detect_emotion_category(user_input)
             if (
                 category
@@ -228,6 +226,7 @@ class MentalHealthChatbot:
 
         except Exception as e:
             print(f"API Error: {e}")
+            # Always return something, even if GPT fails
             return "I'm having trouble responding right now 😔. Please try again shortly."
         
     def detect_emotion_category(self, user_input):

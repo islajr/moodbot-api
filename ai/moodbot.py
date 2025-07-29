@@ -134,9 +134,15 @@ class MentalHealthChatbot:
         return "unspecified"
     
     def get_chat_response(self, user_id, user_input):
+        # DEBUG: Track input and conversation
+        print(f"\n[DEBUG] Incoming message from {user_id}: {user_input}")
+        print(f"[DEBUG] Conversation so far: {self.conversations[user_id]}")
+        print(f"[DEBUG] Daily check-ins: {self.daily_checkins}")
+
         # Crisis check first
         crisis_response = self.check_for_crisis(user_input)
         if crisis_response:
+            print("[DEBUG] Crisis detected!")
             self.conversations.setdefault(user_id, []).append({"role": "assistant", "content": crisis_response})
             return crisis_response
 
@@ -157,8 +163,6 @@ class MentalHealthChatbot:
                 self.awaiting_talk_or_tech[user_id] = None
                 return "Alright. Would you like to try a calming technique together?"
 
-                return "No pressure. Would you like to talk a bit more about what’s weighing on you, or would you prefer to try                         a short calming technique together? 💙"
-
         # Handle pending calming technique consent
         if self.awaiting_technique_consent.get(user_id):
             category = self.awaiting_technique_consent[user_id]
@@ -177,19 +181,21 @@ class MentalHealthChatbot:
         # Save user input in conversation history
         self.conversations.setdefault(user_id, []).append({"role": "user", "content": user_input})
 
-        # Daily mood check-in (only ask once per day)
+        # Daily mood check-in (welcome only ONCE per user/day)
         if user_id not in self.daily_checkins or self.daily_checkins[user_id].date() < datetime.now().date():
             mood = self.extract_mood(user_input)
             if mood != "unspecified":
                 self.daily_checkins[user_id] = datetime.now()
-                print(f"\nMood logged for {user_id} today: {mood}")
-            else:
+                print(f"Mood logged for {user_id} today: {mood}")
+            elif not any("welcome to MoodBot" in msg["content"] for msg in self.conversations[user_id]):
                 checkin_prompt = "Hello, welcome to MoodBot! Before we chat, how are you feeling today?"
                 self.conversations[user_id].append({"role": "assistant", "content": checkin_prompt})
+                print("[DEBUG] Sent welcome message")
                 return checkin_prompt
 
         # Generate AI response
         try:
+            print("🤖 [DEBUG] Sending conversation to GPT for response...")
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=self.conversations["system"] + self.conversations[user_id],
@@ -197,6 +203,7 @@ class MentalHealthChatbot:
                 max_tokens=200
             )
             ai_response = response.choices[0].message.content
+            print(f"DEBUG] GPT raw response: {ai_response}")
 
             # Add empathy and follow-up if emotion detected
             category = self.detect_emotion_category(user_input)
@@ -208,8 +215,6 @@ class MentalHealthChatbot:
             ):
                 empathy = self.empathy_phrases.get(category, "I'm really sorry you're feeling this way.")
                 ai_response = f"{ai_response} {empathy}"
-
-                # Queue next step (talk or calming technique)
                 self.awaiting_talk_or_tech[user_id] = category
                 self.handled_emotion[user_id] = category
                 follow_up = (
@@ -218,15 +223,15 @@ class MentalHealthChatbot:
                     "or would you prefer to try a short calming technique together? 💙"
                 )
                 self.conversations[user_id].append({"role": "assistant", "content": follow_up})
+                print("💬 [DEBUG] Added empathy + follow-up")
                 return follow_up
 
-            # Otherwise return normal response
+            # Otherwise return GPT’s response as is
             self.conversations[user_id].append({"role": "assistant", "content": ai_response})
             return ai_response
 
         except Exception as e:
-            # ✅ NEW FALLBACK LOGGING HERE
-            print(f"Chat response generation failed (OpenAI error): {e}")
+            print(f"[GPT ERROR] Chat response generation failed: {e}")
             print("Using fallback empathetic message instead...\n")
 
             fallback_message = (
@@ -235,6 +240,7 @@ class MentalHealthChatbot:
             )
             self.conversations[user_id].append({"role": "assistant", "content": fallback_message})
             return fallback_message
+
         
     def detect_emotion_category(self, user_input):
         input_lower = user_input.lower()

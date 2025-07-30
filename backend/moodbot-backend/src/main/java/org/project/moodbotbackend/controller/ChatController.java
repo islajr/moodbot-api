@@ -26,24 +26,9 @@ public class ChatController {
     public ChatMessageDTO respond(@DestinationVariable String sessionId, @Payload ChatMessageDTO chatMessageDTO, Principal user) {
 
         // save user message
-        // chatService.saveMessage(chatMessageDTO, sessionId, user);
+         chatService.saveMessage(chatMessageDTO, sessionId, user);
 
         // generate response
-
-        // save response
-
-        // return response
-        // return null;
-
-        Authentication authentication = (Authentication) user;
-
-        return new ChatMessageDTO(
-                sessionId,
-                1L,
-                // "BOT",
-                authentication.getName(),
-                "this is a bare response",
-                LocalDateTime.now()
-        );
+        return chatService.generateResponse(chatMessageDTO, user);
     }
 }

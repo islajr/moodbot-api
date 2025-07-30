@@ -35,6 +35,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             HttpServletRequest req = servletRequest.getServletRequest();
 //            String authHeader = req.getHeader("Authorization");
             String token = req.getParameter("token");     // read from query params
+            System.out.println(token);
 
             // getting principal from token.
             if (token != null) {

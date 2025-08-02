@@ -1,9 +1,8 @@
 package org.project.moodbotbackend.controller;
 
 import lombok.RequiredArgsConstructor;
-
-import org.project.moodbotbackend.dto.app.AppResponse;
-import org.project.moodbotbackend.entity.Chat;
+import org.project.moodbotbackend.dto.app.ChatResponse;
+import org.project.moodbotbackend.dto.app.MainAppResponse;
 import org.project.moodbotbackend.service.AppService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +18,12 @@ public class AppController {
     private final AppService appService;
 
     @GetMapping
-    public ResponseEntity<AppResponse> getMainPage() {
+    public ResponseEntity<MainAppResponse> getMainPage() {
         return appService.generateMainPage();
     }
 
     @GetMapping("/{sessionId}")
-    public ResponseEntity<Chat> getChat(@PathVariable String sessionId) {
+    public ResponseEntity<ChatResponse> getChat(@PathVariable String sessionId) {
         return appService.getChat(sessionId);
     }
 }

@@ -2,6 +2,7 @@ package org.project.moodbotbackend.service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import org.project.moodbotbackend.dto.app.AiRequestDTO;
 import org.project.moodbotbackend.dto.app.AiResponseDTO;
@@ -12,6 +13,7 @@ import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
 import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.project.moodbotbackend.repository.AuthRepository;
+import org.project.moodbotbackend.repository.ChatMessageRepository;
 import org.project.moodbotbackend.repository.ChatRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -29,6 +31,7 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
     private final AuthRepository authRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final MyUserDetailsService myUserDetailsService;
     private final RestTemplate restTemplate;
 
@@ -37,7 +40,6 @@ public class ChatService {
 
     public void saveMessage(ChatMessageDTO messageDTO, String sessionId, Principal user) {
         String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(identifier);
         String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
 
         User myUser = authRepository.findUserByEmail(email);
@@ -50,6 +52,8 @@ public class ChatService {
                 .userId(myUser.getId())
                 .timestamp(LocalDateTime.now())
                 .build();
+
+        chatMessageRepository.save(message);
 
     
         Chat chat = chatRepository.findChatBySessionId(sessionId);
@@ -64,9 +68,9 @@ public class ChatService {
             log.info("chat not found, creating new chat");
             chat = Chat.builder()
                     .sessionId(sessionId)
-                    .slug("default-slug") // might want to change this later on
+                    .slug("default-slug") // placeholder; will change later on
                     .user(myUser)
-                    .messages(null)
+                    .messages(new ArrayList<>())
                     .createdAt(LocalDateTime.now())
                     .updatedAt(null)
                     .build();
@@ -127,8 +131,10 @@ public class ChatService {
                     .timestamp(LocalDateTime.now())
                     .build();
 
+            chatMessageRepository.save(chatMessage);
+
             chat.addMessage(chatMessage);
-            if (chat.getSlug().equals("default-slug"))
+            if (chat.getSlug().equals("default-slug"))  // meaning it hasn't been set
                     chat.setSlug(responseDTO.slug());
 
             chat.setUpdatedAt(LocalDateTime.now());

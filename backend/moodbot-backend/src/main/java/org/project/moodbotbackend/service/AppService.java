@@ -6,6 +6,7 @@ import org.project.moodbotbackend.dto.app.AppResponse;
 import org.project.moodbotbackend.entity.Chat;
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
+import org.project.moodbotbackend.exceptions.auth.AuthException;
 import org.project.moodbotbackend.repository.AuthRepository;
 import org.project.moodbotbackend.repository.ChatRepository;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,10 @@ public class AppService {
 
         User user = authRepository.findUserByEmail(email);
         ArrayList<Chat> chats = chatRepository.findChatsByUser(user);
+
+        if (chats.isEmpty()) {
+            throw new AuthException(404, "there are no chats to display");
+        }
 
         return ResponseEntity.ok(AppResponse.builder()
                 .chats(chats)

@@ -1,6 +1,7 @@
 package org.project.moodbotbackend.websocket;
 
 import java.security.Principal;
+import java.util.Collections;
 
 import org.project.moodbotbackend.entity.User;
 import org.project.moodbotbackend.entity.UserPrincipal;
@@ -13,8 +14,11 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,6 +32,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
     private final MyUserDetailsService myUserDetailsService;
     private final JwtService jwtService;
     private final AuthRepository authRepository;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -44,23 +49,22 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
                 User user = validateAndGetUser(token);
 
                 if (user != null) {
-                    /* Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        user.getPassword(),
-                        Collections.singleton(new SimpleGrantedAuthority("USER"))
-                    ); */
+
                     UserPrincipal userPrincipal = (UserPrincipal) myUserDetailsService.loadUserByUsername(user.getEmail());
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(
-                        userPrincipal,
-                        null,
-                        userPrincipal.getAuthorities()
-                    );
-                    headerAccessor.setUser(authentication);
+
+                    headerAccessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
+                    if (headerAccessor != null) {
+                        headerAccessor.setUser(authentication);
+                    } else {
+                        throw new AuthException(401, "we don't know you");
+                    }
 
                     // set authenticated user in spring security context
-                   /* SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
                     context.setAuthentication(authentication);
-                    SecurityContextHolder.setContext(context);*/
+                    SecurityContextHolder.setContext(context);
                 }
             }
         }

@@ -45,18 +45,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/app");
     }
-
-    @Bean
-    public DefaultHandshakeHandler handshakeHandler() {
-        return new DefaultHandshakeHandler() {
-
-            protected Principal determineUser(
-                    ServerHttpRequest request,
-                    WebSocketHandler webSocketHandler,
-                    Map<String, Object> attributes
-            ) {
-                return (Principal) attributes.get("user");
-            }
-        };
-    }
 }

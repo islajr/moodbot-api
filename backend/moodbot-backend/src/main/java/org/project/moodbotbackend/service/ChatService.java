@@ -37,6 +37,7 @@ public class ChatService {
 
     public void saveMessage(ChatMessageDTO messageDTO, String sessionId, Principal user) {
         String identifier = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(identifier);
         String email = ((UserPrincipal) myUserDetailsService.loadUserByUsername(identifier)).getEmail();
 
         User myUser = authRepository.findUserByEmail(email);

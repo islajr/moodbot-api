@@ -1,32 +1,26 @@
-# MoodBot API
+# Moodbot API
 
-This repository contains the source code for the API of MoodBot - An emotional support and logging chat app.
+This is a REST API for an AI-powered chatbot that provides mental health and emotional support.
 
-Full docs available at: https://documenter.getpostman.com/view/34198518/2sB3BANCqp
+The detailed documenation available at: <https://documenter.getpostman.com/view/34198518/2sB3BANCqp>
 
-## Initial Project Structure
+## Included Features
 
-Contained in the repository's source folder at this point in time are three folders, namely:
-- backend
-- ai
-- shared-docs
+The features included within the current release of the API include:
 
-The 'backend' folder is for all things backend and backend architecture.
+- User Creation and Authentication
+- AI-powered chatting feature
+- Daily mood tracking
+- Optimized responses for emotional support
 
-The 'ai' folder is for the ai model and everything concerning LLMs and such.
+## Entity Relationship Diagram
 
-The 'shared-docs' folder is there to house the postman collections and all other forms of documentation that defines how interaction within this whole project should go.
-This includes endpoints exposed for specific purposes, and guidelines for frontend integration.
+This is the attached ER Diagram for the current release. PDF Version is available [here](<./shared-docs/MoodBot API ER Diagram.pdf>)
 
-I have taken the liberty of adding some stock files in the directories. This is mainly to facilitate the pushing of the directories to this remote URL, as git does not push empty directories.
-These files may be removed at the whim of the developer.
+![png image format of the RTS ER Diagram](<./shared-docs/MoodBot API ER Diagram.png>)
 
-This README file will be updated as required during the course of development.
+## Project Screenshot
 
-## Collaboration rules and Version Control
+This is a screenshot of the project, live on render at <https://moodbot-api.onrender.com>.
 
-Sequel to the above, both the backend and AI developer should create branches, separate from the master branch, to add new features.
-These features may then be merged with the main branch after some sort of integration testing.
-
-This is to ensure that the main line of production is not riddled with error-filled code and also to make sure that damage control is in place in case of any unfortunate bugs or failed integrations.
-
+![Screenshot showing the project deployed and live on Render](./shared-docs/live_screenshot.png)

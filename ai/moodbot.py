@@ -15,6 +15,7 @@ class MentalHealthChatbot:
         self.conversations = defaultdict(list)
         self.awaiting_talk_or_tech = defaultdict(lambda: None)
         self.awaiting_technique_consent = defaultdict(lambda: None)
+        self.handled_emotion = defaultdict(lambda: None)
         self.daily_checkins = {}  
         self.setup_system_prompt()
         self.coping_techniques = {
@@ -31,6 +32,14 @@ class MentalHealthChatbot:
             "sleep": ["can't sleep", "insomnia", "sleep issues", "restless"],
             "panic": ["panic", "panic attack", "freaking out"]
         }
+        self.empathy_phrases = {
+            "anxiety":   "It sounds like a lot is weighing on you right now. I'm really sorry you're feeling anxious.",
+            "stress":    "It seems you're under a great deal of pressure. I'm really sorry it's so stressful.",
+            "depression":"It sounds like things have been really tough lately. I'm sorry you're feeling down.",
+            "sleep":     "Not being able to rest can be exhausting. I'm sorry it's been so hard to sleep well.",
+            "panic":     "Panic can feel overwhelming. I'm sorry you're experiencing this."
+        }
+        
 
     def setup_system_prompt(self):
         self.conversations["system"].append({
@@ -100,9 +109,9 @@ class MentalHealthChatbot:
     
     def get_crisis_response(self, level):
         responses = {
-            "high": "🚨 **IMMEDIATE HELP NEEDED**: 📞 Call 08091116264 or your local emergency line. You're not alone. 💙",
-            "medium": "⚠️ Please reach out to your doctor or a trusted person. Want help finding local resources?",
-            "low": "❤️ I hear you're feeling down. Would you like to talk, try a calming technique, or get info on help?"
+            "high": "**IMMEDIATE HELP NEEDED**: 📞 Call 08091116264 or your local emergency line. You're not alone. 💙",
+            "medium": "Please reach out to your doctor or a trusted person. Want help finding local resources?",
+            "low": "I hear you're feeling down. Would you like to talk, try a calming technique, or get info on help?"
         }
         return responses.get(level, responses["low"])
     
@@ -125,31 +134,37 @@ class MentalHealthChatbot:
         return "unspecified"
     
     def get_chat_response(self, user_id, user_input):
-        # Crisis check
+        # DEBUG: Track input and conversation
+        print(f"\n[DEBUG] Incoming message from {user_id}: {user_input}")
+        print(f"[DEBUG] Conversation so far: {self.conversations[user_id]}")
+        print(f"[DEBUG] Daily check-ins: {self.daily_checkins}")
+
+        # Crisis check first
         crisis_response = self.check_for_crisis(user_input)
         if crisis_response:
-            self.conversations[user_id].append({"role": "assistant", "content": crisis_response})
+            print("[DEBUG] Crisis detected!")
+            self.conversations.setdefault(user_id, []).append({"role": "assistant", "content": crisis_response})
             return crisis_response
-        
-        # Handle talk/tech offer response
-        if self.awaiting_talk_or_tech[user_id]:
+
+        # Handle talk or calming technique flow
+        if self.awaiting_talk_or_tech.get(user_id):
             category = self.awaiting_talk_or_tech[user_id]
             response = user_input.strip().lower()
 
-            if response in ["yes", "yeah", "sure", "ok", "okay"]:
-                self.awaiting_talk_or_tech[user_id] = None
-                return "I'm here for you. Take your time—what’s been on your mind lately? 💬"
+            wants_to_talk = bool(re.search(r"\b(talk|chat|share|yes|yeah|yep|sure|ok|okay|please)\b", response))
+            wants_technique = bool(re.search(r"\b(technique|exercise|calm|breath|ground|relax|try it|help)\b", response))
 
-            elif response in ["no", "not really", "nah"]:
+            if wants_to_talk:
+                self.awaiting_talk_or_tech[user_id] = None
+                return "I'm here for you. Take your time, what’s been on your mind lately?"
+
+            if wants_technique or response in ["no", "not really", "nah"]:
                 self.awaiting_technique_consent[user_id] = category
                 self.awaiting_talk_or_tech[user_id] = None
-                return "Alright, would you like to try a calming technique instead?"
+                return "Alright. Would you like to try a calming technique together?"
 
-            else:
-                return "No pressure at all. Would you like to talk about it or try a calming technique?"
-
-        # Handle pending technique consent
-        if self.awaiting_technique_consent[user_id]:
+        # Handle pending calming technique consent
+        if self.awaiting_technique_consent.get(user_id):
             category = self.awaiting_technique_consent[user_id]
             if re.search(r"\b(yes|sure|ok|okay|please|yeah|yep|alright)\b", user_input.strip().lower()):
                 technique = self.coping_techniques[category][0]
@@ -158,28 +173,29 @@ class MentalHealthChatbot:
                 response = "That's okay. I'm here to talk or just listen whenever you're ready. 💙"
             else:
                 response = "Okay, no problem. I'm here to support however you need. 💙"
-            self.conversations[user_id].append({"role": "assistant", "content": response})
+
+            self.conversations.setdefault(user_id, []).append({"role": "assistant", "content": response})
             self.awaiting_technique_consent[user_id] = None
             return response
 
-        # Save user message
-        self.conversations[user_id].append({"role": "user", "content": user_input})
-        
-        # Daily mood check-in (only ask once per day)
+        # Save user input in conversation history
+        self.conversations.setdefault(user_id, []).append({"role": "user", "content": user_input})
+
+        # Daily mood check-in (welcome only ONCE per user/day)
         if user_id not in self.daily_checkins or self.daily_checkins[user_id].date() < datetime.now().date():
             mood = self.extract_mood(user_input)
             if mood != "unspecified":
                 self.daily_checkins[user_id] = datetime.now()
-                print(f"\n✅ Mood logged for {user_id} today: {mood}")
-            else:
-                checkin_prompt = "🌞 Hello, welcome to MoodBot! Before we chat, how are you feeling today?"
+                print(f"Mood logged for {user_id} today: {mood}")
+            elif not any("welcome to MoodBot" in msg["content"] for msg in self.conversations[user_id]):
+                checkin_prompt = "Hello, welcome to MoodBot! Before we chat, how are you feeling today?"
                 self.conversations[user_id].append({"role": "assistant", "content": checkin_prompt})
+                print("[DEBUG] Sent welcome message")
                 return checkin_prompt
-        
 
         # Generate AI response
         try:
-            # Build history with system prompt
+            print("🤖 [DEBUG] Sending conversation to GPT for response...")
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=self.conversations["system"] + self.conversations[user_id],
@@ -187,22 +203,44 @@ class MentalHealthChatbot:
                 max_tokens=200
             )
             ai_response = response.choices[0].message.content
+            print(f"DEBUG] GPT raw response: {ai_response}")
 
-            # Check for emotional keywords and ask for consent
+            # Add empathy and follow-up if emotion detected
             category = self.detect_emotion_category(user_input)
-            if category:
+            if (
+                category
+                and not self.awaiting_talk_or_tech.get(user_id)
+                and not self.awaiting_technique_consent.get(user_id)
+                and self.handled_emotion.get(user_id) != category
+            ):
+                empathy = self.empathy_phrases.get(category, "I'm really sorry you're feeling this way.")
+                ai_response = f"{ai_response} {empathy}"
                 self.awaiting_talk_or_tech[user_id] = category
-                follow_up = f"{ai_response}\n\nWould you like to talk about it?"
+                self.handled_emotion[user_id] = category
+                follow_up = (
+                    f"{ai_response}\n\n"
+                    "Would you like to talk a bit more about what’s weighing on you, "
+                    "or would you prefer to try a short calming technique together? 💙"
+                )
                 self.conversations[user_id].append({"role": "assistant", "content": follow_up})
+                print("💬 [DEBUG] Added empathy + follow-up")
                 return follow_up
 
-            # Otherwise, return normal response
+            # Otherwise return GPT’s response as is
             self.conversations[user_id].append({"role": "assistant", "content": ai_response})
             return ai_response
 
         except Exception as e:
-            print(f"API Error: {e}")
-            return "I'm having trouble responding right now 😔. Please try again shortly."
+            print(f"[GPT ERROR] Chat response generation failed: {e}")
+            print("Using fallback empathetic message instead...\n")
+
+            fallback_message = (
+                "I'm here to support you, even if I can’t access my full resources right now. "
+                "Can you tell me a bit more about how you’re feeling? 💙"
+            )
+            self.conversations[user_id].append({"role": "assistant", "content": fallback_message})
+            return fallback_message
+
         
     def detect_emotion_category(self, user_input):
         input_lower = user_input.lower()

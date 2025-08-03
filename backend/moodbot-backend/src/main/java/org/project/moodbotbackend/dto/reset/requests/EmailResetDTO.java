@@ -8,7 +8,7 @@ public record EmailResetDTO(
 
         @NotNull(message = "e-mail field is required.")
         @Email(message = "please input a valid e-mail address.")
-        @Size(min = 5, max = 50)
+        @Size(min = 5, max = 100)
         String email
 ) {
 }

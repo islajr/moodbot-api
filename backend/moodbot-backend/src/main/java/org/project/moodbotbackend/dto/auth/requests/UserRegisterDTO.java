@@ -16,7 +16,7 @@ public record UserRegisterDTO(
         @NotNull
         @NotBlank(message = "an e-mail address is required")
         @Email(message = "provide a valid e-mail address")
-        @Size(min = 5, max = 50, message = "email must be between 5 and 50 characters long")
+        @Size(min = 5, max = 100, message = "email must be between 5 and 100 characters long")
         String email,
 
         @NotNull

@@ -2,6 +2,8 @@
 
 This repository contains the source code for the API of MoodBot - An emotional support and logging chat app.
 
+Full docs available at: https://documenter.getpostman.com/view/34198518/2sB3BANCqp
+
 ## Initial Project Structure
 
 Contained in the repository's source folder at this point in time are three folders, namely:

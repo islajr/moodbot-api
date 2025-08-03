@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodBot Prototyping</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header><h1>MoodBot</h1></header>
+    <main>
+        <div class="main-container">
+            <div class="auth-container" id="sign-up-container">
+                <h2>Sign Up</h2>
+                <form action="" method="post" id="sign-up-form">
+                    <label for="signup-username">Username:</label>
+                    <input type="text" id="signup-username" name="username" required minlength="3" maxlength="20">
+
+                    <label for="signup-e-mail">E-mail:</label>
+                    <input type="email" name="signup-e-mail" id="signup-e-mail" required minlength="5" maxlength="50">
+                    
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" name="signup-password" required minlength="8" maxlength="75" a>
+                    
+                    <button type="submit" id="signup-submit-button">Sign Up</button>
+                    
+                    <h4 id="login-prompt">Already have an account?
+                    + Click <a href="#" onclick="
+                    document.getElementById('login-container').style.display='flex';
+                    document.getElementById('sign-up-container').style.display='none'">here</a></h4>
+                
+                </form>
+            </div>
+
+            <!-- Login form -->
+             <div class="auth-container" id="login-container" hidden>
+                <h2>Login</h2>
+                <form action="" method="post" hidden id="login-form">
+                    <label for="login-identifier">Username or E-mail:</label>
+                    <input type="text" id="login-identifier" name="identifier" required minlength="3" maxlength="50">
+
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" name="password" required minlength="8" maxlength="75">
+
+                    <button type="submit">Login</button>
+
+                    <h4 id="login-prompt">Don't have an account?
+                    + Click <a href="#" onclick="
+                    document.getElementById('login-container').style.display='none';
+                    document.getElementById('sign-up-container').style.display='flex'">here</a></h4>
+                </form>
+             </div>
+
+            <!-- E-mail confirmation component -->
+             <div id="email-confirmation" hidden>
+                <div class="confirmation-container">
+                    <h2>E-mail Confirmation</h2>
+                    <p>Please provide the OTP sent to your e-mail address:</p>
+                    <label for="otp" id="otp-container">
+                        <!-- <input type="text" id="otp" name="otp" required min="6" max="6"> -->
+                        <input type="text" name="otp-1" id="otp-1" class="otp-input" maxlength="1" required>
+                        <input type="text" name="otp-2" id="otp-2" class="otp-input" maxlength="1" required>
+                        <input type="text" name="otp-3" id="otp-3" class="otp-input" maxlength="1" required>
+                        <input type="text" name="otp-4" id="otp-4" class="otp-input" maxlength="1" required>
+                        <input type="text" name="otp-5" id="otp-5" class="otp-input" maxlength="1" required>
+                        <input type="text" name="otp-6" id="otp-6" class="otp-input" maxlength="1" required>
+                    </label>
+                    
+                    <button type="submit" id="confirm-otp" name="confirm">Confirm OTP</button>
+                    <p id="resend-otp">Didn't receive the OTP? <a href="#" onclick="resendOtp()">Resend OTP</a></p>
+                </div>
+             </div>
+                
+
+        </div>
+    </main>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

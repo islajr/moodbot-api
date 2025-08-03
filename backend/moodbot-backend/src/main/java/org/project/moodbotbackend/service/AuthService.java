@@ -15,7 +15,6 @@ import org.project.moodbotbackend.repository.AuthRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -87,7 +86,7 @@ public class AuthService {
                         return generateToken(email);
                     }
                     throw new AuthException(400, "incorrect details");
-                } throw new AuthException(401, "please verify your e-mail first");
+                } throw new AuthException(401, "please verify your e-mail first");  // return e-mail address for compulsory confirmation upon login
 
         } throw new AuthException(404, "no such user.");
 

@@ -15,6 +15,7 @@ public class CustomCorsConfiguration implements CorsConfigurationSource {
         config.setAllowedOrigins(List.of("*"));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
         return config;
     }

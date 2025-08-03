@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodBot</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header><h1>MoodBot</h1></header>
+    <main>
+        <div class="chat-container">
+            <aside class="sidebar">
+                <div class="sidebar-container">
+                    <div class="functions">
+                        <button id="create-chat-room" onclick="
+                            document.getElementById('chat-area').hidden=false;
+                            ">New Chat</button>
+                    </div>
+                    <div class="history">
+                        <h2>Chat History</h2>
+                        <ul id="chat-history">
+                            <!-- <li class="chat-room" onclick="openChatRoom('room1')">Chat Room 1</li>
+                            <li class="chat-room" onclick="openChatRoom('room2')">Chat Room 2</li>
+                            <li class="chat-room" onclick="openChatRoom('room3')">Chat Room 3</li> -->
+                        <!-- Chat rooms will be dynamically populated here -->
+                        </ul>
+                    </div>
+                    
+                </div>
+            </aside>
+            <div id="chat-area" hidden>
+                <div class="chat-area-container">
+                    <form action="" method="post" id="chat-form">
+                        <label for="prompt">How do you feel?</label>
+                        <input type="text" id="prompt" name="prompt" required autocorrect="on" a>
+                        <button type="submit">Enter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../js/chat.js"></script>
+</body>
+</html>
